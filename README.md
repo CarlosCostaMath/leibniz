@@ -1,16 +1,11 @@
 # Leibniz Blog
 
-Site estático construído com [Jekyll](https://jekyllrb.com/) para hospedar o conteúdo do blog Leibniz. Este repositório reúne os layouts, componentes e conteúdos em português publicados em https://carloscostamath.github.io/leibniz.
-
-## Como executar localmente
-
-1. Instale Ruby (>= 3.1) e as gems `jekyll` e `bundler` (`gem install jekyll bundler`).
-2. Dentro da pasta do projeto execute:
-   ```bash
-   jekyll serve --livereload --baseurl ""
-   ```
-   O `baseurl` vazio garante que os caminhos funcionem em `http://localhost:4000` mesmo que, em produção, o site rode sob `/leibniz`.
-3. Gere a versão estática, quando necessário, com `jekyll build`.
+Site estático construído com [Jekyll](https://jekyllrb.com/) e com design base
+[Massively](https://html5up.net/massively){:target="_blank" rel="noopener noreferrer"} por
+[HTML5 UP](https://html5up.net/){:target="_blank" rel="noopener noreferrer"} — 
+[CC BY 3.0](https://html5up.net/license){:target="_blank" rel="license noopener noreferrer"}
+para hospedar o conteúdo do blog Leibniz. Este repositório reúne os layouts, componentes e
+conteúdos em português publicados em <https://carloscostamath.github.io/leibniz>.
 
 ## Estrutura essencial
 
@@ -26,33 +21,6 @@ category/, tag/    → Páginas dinâmicas para listar categorias e tags via JS
 *.html, *.md na raiz → Páginas fixas (Início, Sobre, Contato, Arquivos, Tags, Categorias)
 ```
 
-## Publicando conteúdo
-
-- **Postagens:** salve arquivos Markdown em `_posts/` usando o padrão `YYYY-MM-DD-nome.md`. Utilize o front matter padrão:
-  ```yaml
-  ---
-  layout: post
-  title: "Título do artigo"
-  subtitle: "Subtítulo opcional"
-  date: 2025-11-26 12:00:00 -0300
-  featured: true            # exibe em destaque na home (o mais recente vence)
-  hero_image: images/pasta/imagem.jpg
-  hero_caption: "Legenda opcional"
-  description: "Resumo exibido nos cards"
-  author: Nome do autor
-  reading_time: "X min de leitura"
-  categories:
-    - Nome da categoria
-  tags:
-    - Etiqueta
-  ---
-  ```
-  - Use `<!--more-->` para definir o resumo manual de um post.
-  - As imagens devem ficar em `images/` e ser referenciadas com caminhos relativos (`/images/...`).
-  - Componentes especiais (boxes, timelines, galerias) estão em `_includes/post-boxes.html` e podem ser inseridos com `{% include post-boxes.html type="..." %}`.
-
-- **Páginas estáticas:** arquivos `.md` ou `.html` na raiz utilizam `layout: default`. Configure `nav_section` e `permalink` no front matter para controlar o menu ativo. É possível adicionar estilos e scripts específicos via `extra_css` e `extra_js` (arrays de URLs relativos).
-
 ## Taxonomias e navegação
 
 - O menu principal é definido em `_data/navigation.yml`.
@@ -64,11 +32,3 @@ category/, tag/    → Páginas dinâmicas para listar categorias e tags via JS
 - `assets/css/main.css` e `assets/css/custom.css` centralizam o estilo global. Novas regras específicas podem ser adicionadas em arquivos dedicados e incluídas via `extra_css` no front matter.
 - Scripts adicionais ficam em `assets/js/`. Para páginas que precisam de JS específico, liste os arquivos em `extra_js`.
 - O rodapé e demais blocos recorrentes residem em `_includes/` (`footer.html`, `breadcrumb.html`, `home/intro.html`). Prefira editar esses fragmentos quando houver mudanças estruturais.
-
-## Boas práticas editoriais
-
-- Preencha sempre `description`, `author` e `reading_time` para manter a consistência dos cards e da experiência do leitor.
-- Marque apenas um post como `featured` por vez; o destaque da home seleciona automaticamente o mais recente com essa flag.
-- Otimize imagens antes de subir (formatos JPEG/WEBP recomendados) e mantenha nomes descritivos.
-- Revise links externos adicionando `target="_blank"` e `rel="noopener"` quando apropriado.
-
