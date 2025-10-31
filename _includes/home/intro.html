@@ -1,8 +1,31 @@
-<div id="intro">
-  <h1>Ars Calculandi<br />
-  Leibniz Blog</h1>
-  <p>Uma imersão nas ideias de Gottfried Wilhelm Leibniz: lógica, filosofia, matemática e as conexões que moldaram a computação moderna.</p>
-  <ul class="actions">
-    <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
-  </ul>
+{%- assign post_count = site.posts | size -%}
+<div id="intro" class="hero">
+  <div class="hero-ornament" aria-hidden="true"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Filosofia · Matemática · Lógica</span>
+    <h1>Ars Calculandi<span>Leibniz Blog</span></h1>
+    <p>Uma imersão nas ideias de Gottfried Wilhelm Leibniz — explorando lógica, filosofia, matemática e as conexões que moldaram a computação moderna.</p>
+    <div class="hero-actions">
+      <a href="#main" class="button primary icon solid fa-book-open scrolly">Explorar artigos</a>
+      <a href="{{ '/sobre/' | relative_url }}" class="button ghost">Conheça o projeto</a>
+    </div>
+    <div class="hero-meta" role="presentation">
+      <span class="meta-pill">
+        <span class="meta-label">Artigos publicados</span>
+        <strong>{{ post_count }}</strong>
+      </span>
+      <span class="meta-pill">
+        <span class="meta-label">Última atualização</span>
+        <strong>{{ site.time | date: '%d/%m/%Y' }}</strong>
+      </span>
+      <span class="meta-pill">
+        <span class="meta-label">Temas em destaque</span>
+        <span>Lógica · Filosofia · História da ciência</span>
+      </span>
+    </div>
+    <div class="hero-scroll">
+      <span class="scroll-indicator" aria-hidden="true"><span class="dot"></span></span>
+      <span class="scroll-label">Deslize para explorar</span>
+    </div>
+  </div>
 </div>
