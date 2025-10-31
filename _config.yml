@@ -15,17 +15,7 @@ collections:
     output: true
 
 excerpt_separator: "<!--more-->"
-plugins:
-  - jekyll-archives
-
-jekyll-archives:
-  enabled:
-    - categories
-    - tags
-  layout: taxonomy_archive
-  permalinks:
-    category: /categoria/:name/
-    tag: /tag/:name/
+plugins: []
 
 defaults:
   - scope:
