@@ -56,10 +56,7 @@
             {%- for item in socials -%}
               <li><a href="{{ item.url }}" class="icon brands {{ item.icon }}" rel="noopener"><span class="label">{{ item.label | default: item.icon }}</span></a></li>
             {%- endfor -%}
-          {%- else -%}
-		   <li><a href="{{ '/news/' | relative_url }}"
-	              class="icon solid fa-newspaper"
-	              aria-label="News"></a></li>	
+          {%- else -%}	
 		   <li><a href="{{ '/contato/' | relative_url }}"
 				  class="icon solid fa-envelope"
 			      aria-label="Contato"></a></li>
