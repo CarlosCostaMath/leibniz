@@ -1,0 +1,26 @@
+title: "Leibniz Blog"
+lang: pt-BR
+
+url: "https://carloscostamath.github.io"
+baseurl: "/leibniz"          # "" se for user site
+timezone: America/Maceio
+future: true
+
+markdown: kramdown
+theme: null
+permalink: /:categories/:year/:month/:day/:title/
+
+collections:
+  posts:
+    output: true
+
+excerpt_separator: "<!--more-->"
+plugins: []
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      extra_css:
+        - /assets/css/post.css
