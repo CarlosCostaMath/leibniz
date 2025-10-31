@@ -1,5 +1,6 @@
 <footer class="site-footer" role="contentinfo">
   <div class="inner">
+    <!-- Cabeçalho do rodapé com marca e redes -->
     <div class="footer-header">
       <h3 class="footer-title">
         <a href="{{ '/' | relative_url }}">
@@ -23,23 +24,12 @@
       </div>
     </div>
 
+    <!-- Navegação complementar do rodapé -->
     <nav class="footer-nav" aria-label="Rodapé – Menu">
-      <ul>
-        {%- assign nav_items = site.data.navigation -%}
-        {%- if nav_items and nav_items.size > 0 -%}
-          {%- for item in nav_items -%}
-            <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
-          {%- endfor -%}
-        {%- else -%}
-          <li><a href="{{ '/' | relative_url }}">Início</a></li>
-          <li><a href="{{ '/archives/' | relative_url }}">Arquivos</a></li>
-          <li><a href="{{ '/tags/' | relative_url }}">Tags</a></li>
-          <li><a href="{{ '/categories/' | relative_url }}">Categorias</a></li>
-          <li><a href="{{ '/sobre/' | relative_url }}">Sobre</a></li>
-        {%- endif -%}
-      </ul>
+      {%- include navigation-links.html -%}
     </nav>
 
+    <!-- Créditos e direitos autorais -->
     <div class="footer-bottom">
       <span>&copy; {{ 'now' | date: "%Y" }}. Todos os direitos reservados.</span>
       <span>
