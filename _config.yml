@@ -21,25 +21,6 @@ plugins:
 paginate: 7
 paginate_path: "/page/:num/"
 
-social:
-  - icon: fa-envelope
-    style: solid
-    label: "Contato"
-    aria_label: "Fale conosco"
-    url: "/contato/"
-  - icon: fa-facebook-f
-    style: brands
-    label: "Facebook"
-    url: "https://www.facebook.com/Gefilufs/?notif_id=1761574412171719&notif_t=page_user_activity&ref=notif"
-  - icon: fa-youtube
-    style: brands
-    label: "YouTube"
-    url: "https://www.youtube.com/channel/UCA9EGhEDoLcWiPIee0MAIqA"
-  - icon: fa-github
-    style: brands
-    label: "GitHub"
-    url: "https://github.com/CarlosCostaMath/leibniz/"
-
 defaults:
   - scope:
       path: ""
