@@ -1,0 +1,67 @@
+---
+layout: default
+title: "Busca"
+nav_section: search
+body_classes: search-page
+wrap_inner: false
+extra_js:
+  - /assets/js/search.js
+---
+
+{%- assign popular_posts = site.posts | sort: 'views' | reverse | slice: 0, 4 -%}
+
+<section class="search-pane">
+  <div class="search-pane__inner">
+    <p class="search-pane__legend">DIGITE O(S) TERMO(S) E PRESSIONE ENTER</p>
+    <h1 class="search-pane__title">O que você está procurando?</h1>
+
+    <form
+      id="site-search-form"
+      class="search-form"
+      role="search"
+      aria-label="Pesquisar no site"
+      data-endpoint="{{ '/search.json' | relative_url }}"
+    >
+      <label class="sr-only" for="search-input">Buscar por conteúdo</label>
+      <div class="search-form__field">
+        <input
+          id="search-input"
+          type="search"
+          name="q"
+          placeholder="Busque por artigos, categorias ou tags"
+          autocomplete="off"
+          spellcheck="false"
+          required
+        />
+        <button type="submit" class="search-form__button" aria-label="Buscar">
+          <span class="icon solid fa-search" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="search-form__hint">Pressione Enter para ver os resultados</p>
+    </form>
+
+    <div class="search-pane__divider" role="presentation"></div>
+
+    <div id="search-feedback" class="search-feedback" aria-live="polite">
+      Comece digitando para encontrar conteúdos.
+    </div>
+
+    <div id="search-results" class="search-results" aria-live="polite"></div>
+
+    <section class="search-popular" aria-label="Posts mais visitados">
+      <p class="search-popular__legend">Mais visitados</p>
+      <div class="search-popular__grid">
+        {%- if popular_posts and popular_posts.size > 0 -%}
+          {%- for post in popular_posts -%}
+          <a class="search-popular__item" href="{{ post.url | relative_url }}">
+            <span class="search-popular__title">{{ post.title }}</span>
+            <span class="search-popular__arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          {%- endfor -%}
+        {%- else -%}
+          <p class="search-popular__empty">Ainda não há posts populares para exibir.</p>
+        {%- endif -%}
+      </div>
+    </section>
+  </div>
+</section>
