@@ -1,18 +1,130 @@
 ---
-layout: null
+layout: default
+title: Tag
 permalink: /tag/
+nav_section: tags
 ---
-{%- assign all_tags = site.tags | sort_natural -%}
-{%- if all_tags and all_tags.size > 0 -%}
-  {%- assign first_entry = all_tags[0] -%}
-  {%- assign first_name = first_entry[0] -%}
-  {%- assign slug = first_name | slugify -%}
-  {%- capture target %}/tag/{{ slug }}/{% endcapture %}
-  <meta http-equiv="refresh" content="0; url={{ target | relative_url }}">
-  <link rel="canonical" href="{{ target | relative_url }}">
-  <p>Redirecionando para a tag #{{ first_name }}...</p>
-{%- else -%}
-  <meta http-equiv="refresh" content="0; url={{ '/tags/' | relative_url }}">
-  <link rel="canonical" href="{{ '/tags/' | relative_url }}">
-  <p>Redirecionando para a lista de tags...</p>
-{%- endif -%}
+{% include breadcrumb.html %}
+<section id="tag-page" class="post">
+  <header class="major" style="display:block;">
+    <h1 id="tag-title">#Tag</h1>
+    <p id="tag-sub" class="dek">Publicações marcadas com esta tag.</p>
+  </header>
+
+  <div id="tag-container" class="posts index-grid"></div>
+
+  <p id="tag-empty" style="display:none; text-align:center;">Não há publicações com esta tag.</p>
+</section>
+
+<style>
+  /* Layout e tipografia da página de tag */
+  #tag-page { padding: 3rem 0; }
+  #tag-page h1 {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 0.25rem;
+  }
+  #tag-page p.dek {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  /* Cards dos posts (estilo Massively) */
+  #tag-container { row-gap: 2rem; }
+  #tag-container article {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  #tag-container article:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  }
+  #tag-container article time {
+    display: block;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.35rem;
+  }
+  #tag-container article h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+  #tag-container article a {
+    color: #1a1a1a;            /* Corrige links brancos */
+    text-decoration: none;
+  }
+  #tag-container article a:hover {
+    color: #007acc;
+    text-decoration: underline;
+  }
+</style>
+
+<!-- Dados inline: Jekyll injeta todas as tags/posts no build -->
+<script>
+  window.__TAGS__ = {
+    {%- for t in site.tags -%}
+      {%- assign name = t[0] -%}{%- assign slug = name | slugify -%}
+      "{{ slug }}": {
+        label: {{ name | jsonify }},
+        posts: [
+          {%- assign _posts = t[1] | sort: "date" | reverse -%}
+          {%- for p in _posts -%}
+            { title: {{ p.title | jsonify }}, url: "{{ p.url | relative_url }}", date: "{{ p.date | date: "%Y-%m-%d" }}" }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
+</script>
+
+<script>
+(function() {
+  function getParam(name){
+    const m=new RegExp('[?&]'+name+'=([^&]+)').exec(location.search);
+    return m?decodeURIComponent(m[1].replace(/\+/g,' ')):null;
+  }
+
+  const slug = getParam('t');
+  const titleEl = document.getElementById('tag-title');
+  const subEl   = document.getElementById('tag-sub');
+  const contEl  = document.getElementById('tag-container');
+  const emptyEl = document.getElementById('tag-empty');
+
+  if(!slug){
+    titleEl.textContent = '#(selecione uma tag)';
+    subEl.textContent   = 'Use a página de Tags para escolher.';
+    emptyEl.style.display = 'block';
+    return;
+  }
+
+  const entry = (window.__TAGS__ || {})[slug];
+
+  if(!entry){
+    titleEl.textContent = '#'+slug;
+    subEl.textContent   = 'Tag não encontrada.';
+    emptyEl.style.display = 'block';
+    return;
+  }
+
+  titleEl.textContent = '#'+entry.label;
+  subEl.textContent   = `${entry.posts.length} ${entry.posts.length===1?'publicação':'publicações'}`;
+
+  contEl.innerHTML = '';
+  entry.posts.forEach(p=>{
+    const article = document.createElement('article');
+    const nice = new Date(p.date).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+    article.innerHTML = `
+      <time datetime="${p.date}">${nice}</time>
+      <h2><a href="${p.url}">${p.title || '(Sem título)'}</a></h2>
+    `;
+    contEl.appendChild(article);
+  });
+
+  if(entry.posts.length === 0) emptyEl.style.display = 'block';
+})();
+</script>
