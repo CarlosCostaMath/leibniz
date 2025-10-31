@@ -28,7 +28,7 @@ extra_css:
         {%- assign name = c[0] -%}
         {%- assign slug = name | slugify -%}
         <li>
-          <a class="button small outline" href="{{ '/category/' | append: slug | append: '/' | relative_url }}">
+          <a class="button small outline" href="{{ '/category/' | relative_url }}?c={{ slug }}">
             {{ name }} <span class="taxonomy-count">({{ c[1].size }})</span>
           </a>
         </li>
