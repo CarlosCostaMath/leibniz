@@ -1,11 +1,14 @@
 # Leibniz Blog
 
-Site estático construído com [Jekyll](https://jekyllrb.com/) e com design base
-[Massively](https://html5up.net/massively){:target="_blank" rel="noopener noreferrer"} por
-[HTML5 UP](https://html5up.net/){:target="_blank" rel="noopener noreferrer"} — 
-[CC BY 3.0](https://html5up.net/license){:target="_blank" rel="license noopener noreferrer"}
-para hospedar o conteúdo do blog Leibniz. Este repositório reúne os layouts, componentes e
-conteúdos em português publicados em <https://carloscostamath.github.io/leibniz>.
+Site estático construído com 
+<a href="https://jekyllrb.com/" target="_blank" rel="noopener noreferrer">Jekyll</a> 
+e com design base 
+<a href="https://html5up.net/massively" target="_blank" rel="noopener noreferrer">Massively</a> 
+por 
+<a href="https://html5up.net/" target="_blank" rel="noopener noreferrer">HTML5 UP</a> — 
+<a href="https://html5up.net/license" target="_blank" rel="license noopener noreferrer">CC BY 3.0</a> 
+para hospedar o conteúdo do blog Leibniz. Este repositório reúne os layouts, componentes e conteúdos em português publicados em 
+<a href="https://carloscostamath.github.io/leibniz" target="_blank" rel="noopener noreferrer">carloscostamath.github.io/leibniz</a>.
 
 ## Estrutura essencial
 
