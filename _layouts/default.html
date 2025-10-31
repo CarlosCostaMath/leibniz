@@ -40,79 +40,23 @@
         <ul class="links">
           {%- if nav_items and nav_items.size > 0 -%}
             {%- for item in nav_items -%}
-              {%- assign is_icon_link = item.icon and item.icon != '' -%}
-              {%- capture li_classes -%}
-                {%- if item.section and page.nav_section == item.section -%}active{%- elsif item.match and page.url contains item.match -%}active{%- elsif item.url and page.url == item.url -%}active{%- endif -%}
-              {%- endcapture -%}
-              {%- assign li_classes = li_classes | strip -%}
-              {%- if is_icon_link -%}
-                {%- if li_classes != '' -%}
-                  {%- assign li_classes = li_classes | append: ' ' -%}
-                {%- endif -%}
-                {%- assign li_classes = li_classes | append: 'nav-item--icon' -%}
-              {%- endif -%}
-              {%- assign link_classes = 'nav-link' -%}
-              {%- if is_icon_link -%}
-                {%- assign link_classes = link_classes | append: ' nav-link--icon' -%}
-              {%- endif -%}
-              <li{% if li_classes != '' %} class="{{ li_classes }}"{% endif %}>
-                <a
-                  href="{{ item.url | relative_url }}"
-                  class="{{ link_classes }}"
-                  aria-label="{{ item.aria_label | default: item.title | default: item.icon }}"
-                >
-                  {%- if is_icon_link -%}
-                    <span class="icon {{ item.icon_style | default: 'solid' }} {{ item.icon }}" aria-hidden="true"></span>
-                    <span class="sr-only">{{ item.aria_label | default: item.title | default: item.icon }}</span>
-                  {%- else -%}
-                    {{ item.title }}
-                  {%- endif -%}
-                </a>
-              </li>
+          <li class="{% if item.section and page.nav_section == item.section %}active{% elsif item.match and page.url contains item.match %}active{% elsif item.url and page.url == item.url %}active{% endif %}"><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
             {%- endfor -%}
           {%- else -%}
-          <li class="{% if page.nav_section == 'home' or page.url == '/' %}active{% endif %}"><a class="nav-link" href="{{ '/' | relative_url }}">Início</a></li>
-          <li class="{% if page.nav_section == 'archives' or page.url contains '/archives/' %}active{% endif %}"><a class="nav-link" href="{{ '/archives/' | relative_url }}">Arquivos</a></li>
-          <li class="{% if page.nav_section == 'tags' or page.url contains '/tags/' %}active{% endif %}"><a class="nav-link" href="{{ '/tags/' | relative_url }}">Tags</a></li>
-          <li class="{% if page.nav_section == 'categories' or page.url contains '/categories/' %}active{% endif %}"><a class="nav-link" href="{{ '/categories/' | relative_url }}">Categorias</a></li>
-          <li class="{% if page.nav_section == 'about' or page.url contains '/sobre/' %}active{% endif %}"><a class="nav-link" href="{{ '/sobre/' | relative_url }}">Sobre</a></li>
-          <li class="nav-item--icon {% if page.nav_section == 'search' or page.url contains '/search/' %}active{% endif %}">
-            <a class="nav-link nav-link--icon" href="{{ '/search/' | relative_url }}" aria-label="Buscar">
-              <span class="icon solid fa-search" aria-hidden="true"></span>
-              <span class="sr-only">Buscar</span>
-            </a>
-          </li>
+          <li class="{% if page.nav_section == 'home' or page.url == '/' %}active{% endif %}"><a href="{{ '/' | relative_url }}">Início</a></li>
+          <li class="{% if page.nav_section == 'archives' or page.url contains '/archives/' %}active{% endif %}"><a href="{{ '/archives/' | relative_url }}">Arquivos</a></li>
+          <li class="{% if page.nav_section == 'tags' or page.url contains '/tags/' %}active{% endif %}"><a href="{{ '/tags/' | relative_url }}">Tags</a></li>
+          <li class="{% if page.nav_section == 'categories' or page.url contains '/categories/' %}active{% endif %}"><a href="{{ '/categories/' | relative_url }}">Categorias</a></li>
+          <li class="{% if page.nav_section == 'about' or page.url contains '/sobre/' %}active{% endif %}"><a href="{{ '/sobre/' | relative_url }}">Sobre</a></li>
           {%- endif -%}
         </ul>
         <ul class="icons">
           {%- assign socials = site.social | default: site.social_links -%}
           {%- if socials -%}
             {%- for item in socials -%}
-              {%- assign icon_style = item.style | default: 'brands' -%}
-              {%- assign raw_url = item.url | default: '#' -%}
-              {%- assign is_external = raw_url contains '://' -%}
-              {%- if is_external -%}
-                {%- assign final_url = raw_url -%}
-              {%- else -%}
-                {%- assign final_url = raw_url | relative_url -%}
-              {%- endif -%}
-              <li>
-                <a
-                  href="{{ final_url }}"
-                  class="icon {{ icon_style }} {{ item.icon }}"
-                  {%- if is_external -%}
-                    target="{{ item.target | default: '_blank' }}"
-                    rel="{{ item.rel | default: 'noopener noreferrer' }}"
-                  {%- elsif item.rel -%}
-                    rel="{{ item.rel }}"
-                  {%- endif -%}
-                  aria-label="{{ item.aria_label | default: item.label | default: item.icon }}"
-                >
-                  <span class="label">{{ item.label | default: item.icon }}</span>
-                </a>
-              </li>
+              <li><a href="{{ item.url }}" class="icon brands {{ item.icon }}" rel="noopener"><span class="label">{{ item.label | default: item.icon }}</span></a></li>
             {%- endfor -%}
-          {%- else -%}
+          {%- else -%}	
 		   <li><a href="{{ '/contato/' | relative_url }}"
 				  class="icon solid fa-envelope"
 			      aria-label="Contato"></a></li>
