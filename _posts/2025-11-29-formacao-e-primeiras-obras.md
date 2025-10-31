@@ -15,6 +15,7 @@ tags:
 - Leibniz
 - Obras
 - Formação
+views: 980
 ---
 
 ## Infância, Contexto Familiar e Primeira Educação

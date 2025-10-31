@@ -20,6 +20,7 @@ tags:
 - Característica Universal
 - Semiótica
 - Lógica
+views: 1540
 ---
 - 🔖 **Tipo**: Ensaio analítico  
 - 📚 **Obra**: *Leibniz e a Linguagem (II): línguas artificiais, lógica e matemática*  
