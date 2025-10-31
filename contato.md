@@ -7,11 +7,13 @@ permalink: /contato/
 
 {% include breadcrumb.html %}
 
+<!-- Seção: Cabeçalho da página -->
 <header class="major">
   <h1>Contato</h1>
   <p>Dúvidas, sugestões ou parcerias?</p>
 </header>
 
+<!-- Seção: Informações de contato -->
 <section class="split contact">
   <section class="alt">
     <h3>Endereço</h3>

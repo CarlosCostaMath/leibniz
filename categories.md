@@ -9,6 +9,7 @@ extra_css:
 ---
 {% include breadcrumb.html %}
 <section class="page-section taxonomy-page" id="categories-page">
+  <!-- Seção: Cabeçalho de categorias -->
   <div class="inner">
     <header class="major taxonomy-header">
       <h1>{{ page.title }}</h1>
@@ -20,14 +21,14 @@ extra_css:
 
   {%- assign all_cats = site.categories | sort -%}
 
+  <!-- Seção: Lista de categorias -->
   {%- if all_cats and all_cats.size > 0 -%}
     <ul class="taxonomy-nav">
       {%- for c in all_cats -%}
         {%- assign name = c[0] -%}
         {%- assign slug = name | slugify -%}
         <li>
-          <a class="button small outline"
-             href="{{ '/category/' | relative_url }}?c={{ slug }}">
+          <a class="button small outline" href="{{ '/category/' | relative_url }}?c={{ slug }}">
             {{ name }} <span class="taxonomy-count">({{ c[1].size }})</span>
           </a>
         </li>

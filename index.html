@@ -6,10 +6,6 @@ home_intro: true
 wrap_inner: false
 ---
 
-{%- comment -%}
-  Página inicial com destaque e últimos posts, usando o layout padrão.
-{%- endcomment -%}
-
 {%- assign featured_posts = site.posts | where: "featured", true | sort: "date" -%}
 {%- assign head = featured_posts | last -%}
 {%- if head == nil -%}
@@ -17,6 +13,7 @@ wrap_inner: false
 {%- endif -%}
 
 {%- if head -%}
+<!-- Seção: Destaque principal -->
 <article class="post featured">
   <header class="major">
     <span class="date">{{ head.date | date: '%B %d, %Y' }}</span>
@@ -39,6 +36,7 @@ wrap_inner: false
 </article>
 {%- endif -%}
 
+<!-- Seção: Lista de posts recentes -->
 <section class="posts">
   {%- assign sorted = site.posts | sort: "date" -%}
   {%- if head == nil -%}
@@ -46,37 +44,37 @@ wrap_inner: false
   {%- endif -%}
   {%- assign others = site.posts | where_exp: "p", "p.url != head.url" | sort: "date" | reverse -%}
 
-  {%- for post in others limit:6 -%}
-  <article>
-    <header>
-      <span class="date">{{ post.date | date: '%B %d, %Y' }}</span>
-      <h2><a href="{{ post.url | relative_url }}">{{ post.title | default: '(Sem título)' }}</a></h2>
-    </header>
+  {%- for post in others limit: 6 -%}
+    <article>
+      <header>
+        <span class="date">{{ post.date | date: '%B %d, %Y' }}</span>
+        <h2><a href="{{ post.url | relative_url }}">{{ post.title | default: '(Sem título)' }}</a></h2>
+      </header>
 
-    <a href="{{ post.url | relative_url }}" class="image fit">
-      <img src="{{ post.cover | default: post.hero_image | default: 'images/pic02.jpg' | relative_url }}" alt="{{ post.title | default: '' }}" />
-    </a>
+      <a href="{{ post.url | relative_url }}" class="image fit">
+        <img src="{{ post.cover | default: post.hero_image | default: 'images/pic02.jpg' | relative_url }}" alt="{{ post.title | default: '' }}" />
+      </a>
 
-    <p>
-      {%- if post.description -%}
-        {{ post.description }}
-      {%- elsif post.excerpt -%}
-        {{ post.excerpt | strip_html | truncatewords: 30 }}
-      {%- else -%}
-        {{ post.content | strip_html | truncatewords: 30 }}
-      {%- endif -%}
-    </p>
+      <p>
+        {%- if post.description -%}
+          {{ post.description }}
+        {%- elsif post.excerpt -%}
+          {{ post.excerpt | strip_html | truncatewords: 30 }}
+        {%- else -%}
+          {{ post.content | strip_html | truncatewords: 30 }}
+        {%- endif -%}
+      </p>
 
-    <ul class="actions special">
-      <li><a href="{{ post.url | relative_url }}" class="button">Ler mais</a></li>
-    </ul>
-  </article>
+      <ul class="actions special">
+        <li><a href="{{ post.url | relative_url }}" class="button">Ler mais</a></li>
+      </ul>
+    </article>
   {%- endfor -%}
 </section>
 
+<!-- Seção: Paginação -->
 <footer>
   <div class="pagination">
-    <!--<a href="#" class="previous">Prev</a>-->
     <a href="#" class="page active">1</a>
     <a href="#" class="page">2</a>
     <a href="#" class="page">3</a>
