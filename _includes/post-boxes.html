@@ -1,0 +1,75 @@
+{%- comment -%}
+Componentes Especiais para Posts
+Veja _posts/2025-10-23-guia-recursos-posts.md para exemplos de uso
+{%- endcomment -%}
+
+{% assign animation = include.animation | default: 'fade-up' %}
+{% assign delay = include.delay %}
+
+{% if include.type == "quote" %}
+<div class="quote-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    {{ include.content | markdownify }}
+    {% if include.cite %}<cite>— {{ include.cite }}</cite>{% endif %}
+</div>
+{% endif %}
+
+{% if include.type == "glossary" or include.type == "definition" %}
+<div class="glossary-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <h4>📖 {{ include.title | default: "Definição" }}</h4>
+    {{ include.content | markdownify }}
+</div>
+{% endif %}
+
+{% if include.type == "concept" %}
+<div class="concept-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <h4>{{ include.title }}</h4>
+    {{ include.content | markdownify }}
+</div>
+{% endif %}
+
+{% if include.type == "concept-grid-start" %}
+<div class="concept-grid" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+{% endif %}
+
+{% if include.type == "concept-grid-end" %}
+</div>
+{% endif %}
+
+{% if include.type == "timeline-start" %}
+<div class="timeline" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+{% endif %}
+
+{% if include.type == "timeline-item" %}
+    <div class="timeline-item post-box" data-animate="{{ include.animation | default: 'timeline' }}"{% if include.delay %} data-animate-delay="{{ include.delay }}"{% endif %}>
+        {% if include.year or include.title %}<h4>{% if include.year %}{{ include.year }} - {% endif %}{{ include.title }}</h4>{% endif %}
+        {{ include.content | markdownify }}
+    </div>
+{% endif %}
+
+{% if include.type == "timeline-end" %}
+</div>
+{% endif %}
+
+{% if include.type == "example" %}
+<div class="example-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <h4>📝 {{ include.title | default: "Exemplo" }}</h4>
+    {{ include.content | markdownify }}
+</div>
+{% endif %}
+
+{% if include.type == "image" %}
+{% assign position = include.position | default: 'center' %}
+{% if include.animation %}
+  {% assign image_animation = include.animation %}
+{% elsif position == 'left' %}
+  {% assign image_animation = 'slide-in-left' %}
+{% elsif position == 'right' %}
+  {% assign image_animation = 'slide-in-right' %}
+{% else %}
+  {% assign image_animation = 'zoom-in' %}
+{% endif %}
+<figure class="post-image {{ position }}" data-animate="{{ image_animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <img src="{{ include.src | relative_url }}" alt="{{ include.alt | default: '' }}" {% if position != 'center' %}loading="lazy"{% else %}loading="eager"{% endif %}>
+    {% if include.caption %}<figcaption>{{ include.caption }}</figcaption>{% endif %}
+</figure>
+{% endif %}

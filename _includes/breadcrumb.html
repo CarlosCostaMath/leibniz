@@ -1,0 +1,29 @@
+<nav aria-label="breadcrumb" class="breadcrumb">
+  <a href="{{ '/' | relative_url }}">Início</a>
+  <span class="sep"> / </span>
+
+  {% if page.url contains '/tag/' %}
+    <a href="{{ '/tags/' | relative_url }}">Tags</a>
+    <span class="sep"> / </span>
+    <span id="breadcrumb-dynamic"></span>
+  {% elsif page.url contains '/category/' %}
+    <a href="{{ '/categories/' | relative_url }}">Categorias</a>
+    <span class="sep"> / </span>
+    <span id="breadcrumb-dynamic"></span>
+  {% else %}
+    <span class="current">{{ page.title }}</span>
+  {% endif %}
+</nav>
+
+<script>
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const tag = params.get('t');
+    const cat = params.get('c');
+    const span = document.getElementById('breadcrumb-dynamic');
+    if (!span) return;
+
+    if (tag) span.textContent = decodeURIComponent(tag);
+    else if (cat) span.textContent = decodeURIComponent(cat);
+  })();
+</script>

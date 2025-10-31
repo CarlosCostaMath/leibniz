@@ -1,0 +1,130 @@
+---
+layout: default
+---
+{% assign share_text = page.description | default: page.excerpt | default: site.description %}
+<!-- CSS Específico para Posts Modernos -->
+
+
+<!-- Breadcrumb (opcional; criamos um stub no passo 2) -->
+
+<!-- Barra de Navegação Flutuante -->
+{% if page.enable_nav_bar != false %}
+<div class="post-nav-bar">
+  <div class="reading-progress" id="readingProgress"></div>
+  <div class="post-nav-content">
+    <div class="post-nav-title">{{ page.title }}</div>
+    <div class="post-nav-actions">
+      {% if page.enable_font_control != false %}
+      <button class="post-nav-btn desktop-only" id="fontDecrease" title="Diminuir fonte" aria-label="Diminuir fonte">A-</button>
+      <button class="post-nav-btn desktop-only" id="fontIncrease" title="Aumentar fonte" aria-label="Aumentar fonte">A+</button>
+      {% endif %}
+      {% if page.enable_share != false %}
+      <button class="post-nav-btn desktop-only" id="shareButton" title="Compartilhar" aria-label="Compartilhar" data-share-text="{{ share_text | strip_html | normalize_whitespace | escape }}">
+      <i class="fas fa-share-alt" aria-hidden="true"></i></button>
+      {% endif %}
+      {% if page.enable_toc != false %}
+      <button class="post-nav-btn desktop-only" id="tocToggle" title="Índice" aria-label="Abrir índice">☰</button>
+      {% endif %}
+      <button class="post-nav-btn mobile-only" id="mobileMenuToggle" title="Menu" aria-label="Abrir menu">
+      <span class="hamburger-icon">⋮</span>
+      </button>
+    </div>
+    <div class="mobile-nav-menu" id="mobileNavMenu">
+      {% if page.enable_font_control != false %}
+      <button class="nav-btn" id="mobileFontDecrease" title="Diminuir fonte">A-</button>
+      <button class="nav-btn" id="mobileFontIncrease" title="Aumentar fonte">A+</button>
+      {% endif %}
+      {% if page.enable_share != false %}
+      <button class="nav-btn" id="mobileShareButton" title="Compartilhar" data-share-text="{{ share_text | strip_html | normalize_whitespace | escape }}">
+      <i class="fas fa-share-alt"></i></button>
+      {% endif %}
+      {% if page.enable_toc != false %}
+      <button class="nav-btn" id="mobileTocToggle" title="Índice">☰</button>
+      {% endif %}
+    </div>
+  </div>
+  {% if page.enable_toc != false %}
+  <div class="toc-dropdown" id="tocDropdown">
+    <h3>Índice do Artigo</h3>
+    <ul id="tocList"></ul>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<article class="post-article">
+    <!-- Hero Image (fallback: hero_image → cover) -->
+    {% assign hero = page.hero_image | default: page.cover %}
+    {% if hero %}
+    <div class="post-hero-image" data-animate="reveal">
+      <img src="{{ hero | relative_url }}" alt="{{ page.title }}" loading="eager">
+      {% if page.hero_caption %}
+        <div class="post-hero-caption">
+          {{ page.hero_caption | safe }}
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  <header>
+    {% if page.categories %}
+    <div class="post-categories" data-animate="fade-up">
+      {% for category in page.categories %}
+        <a href="{{ '/category/' | relative_url }}?c={{ category | slugify }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <h1 data-animate="fade-up">{{ page.title }}</h1>
+
+    {% if page.subtitle %}
+    <p class="post-subtitle" data-animate="fade-up">{{ page.subtitle }}</p>
+    {% endif %}
+
+    {% if page.description %}
+    <div class="post-description" data-animate="fade-up">{{ page.description }}</div>
+    {% endif %}
+
+    <div class="post-meta" data-animate="fade-in">
+      <span><strong>Por:</strong> {{ page.author | default: site.author | default: 'Carlos Costa' }}</span>
+      <span class="separator">•</span>
+      <span><strong>Data:</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d de %B de %Y" }}</time></span>
+      {% if page.reading_time %}
+      <span class="separator">•</span>
+      <span><strong>Leitura:</strong> {{ page.reading_time }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <footer class="post-footer" data-animate="fade-in">
+    {% if page.tags %}
+    <div class="post-tags" data-animate="fade-up">
+      <strong>Tags:</strong>
+      {% for tag in page.tags %}
+        <a href="{{ '/tag/' | relative_url }}?t={{ tag | slugify }}">#{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <ul class="actions">
+      <!-- Se não tiver seção /blog/, volte para a raiz -->
+      <li><a href="{{ '/' | relative_url }}" class="button primary">← Voltar</a></li>
+    </ul>
+  </footer>
+</article>
+
+<!-- Lightbox -->
+{% if page.enable_lightbox != false %}
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">×</button>
+  <img src="" alt="" id="lightboxImage">
+</div>
+{% endif %}
+
+<!-- Back to Top -->
+<a href="#" class="back-to-top" id="backToTop">↑</a>
+
+<script src="{{ '/assets/js/post-enhancements.js' | relative_url }}" defer></script>
