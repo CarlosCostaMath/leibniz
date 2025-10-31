@@ -6,10 +6,24 @@ home_intro: true
 wrap_inner: false
 ---
 
-{%- assign featured_posts = site.posts | where: "featured", true | sort: "date" -%}
-{%- assign head = featured_posts | last -%}
-{%- if head == nil -%}
-  {%- assign head = site.posts | sort: "date" | last -%}
+{%- assign posts_scope = paginator.posts | default: site.posts | sort: "date" | reverse -%}
+{%- unless paginator -%}
+  {%- assign posts_scope = posts_scope | slice: 0, 7 -%}
+{%- endunless -%}
+{%- assign head = nil -%}
+
+{%- if paginator and paginator.page == 1 -%}
+  {%- assign featured_posts = site.posts | where: "featured", true | sort: "date" -%}
+  {%- assign head = featured_posts | last -%}
+  {%- if head == nil -%}
+    {%- assign head = site.posts | sort: "date" | last -%}
+  {%- endif -%}
+{%- elsif paginator == nil -%}
+  {%- assign featured_posts = site.posts | where: "featured", true | sort: "date" -%}
+  {%- assign head = featured_posts | last -%}
+  {%- if head == nil -%}
+    {%- assign head = site.posts | sort: "date" | last -%}
+  {%- endif -%}
 {%- endif -%}
 
 {%- if head -%}
@@ -38,13 +52,12 @@ wrap_inner: false
 
 <!-- Seção: Lista de posts recentes -->
 <section class="posts">
-  {%- assign sorted = site.posts | sort: "date" -%}
-  {%- if head == nil -%}
-    {%- assign head = sorted | last -%}
+  {%- assign posts_list = posts_scope -%}
+  {%- if head -%}
+    {%- assign posts_list = posts_list | where_exp: "post", "post.url != head.url" -%}
   {%- endif -%}
-  {%- assign others = site.posts | where_exp: "p", "p.url != head.url" | sort: "date" | reverse -%}
 
-  {%- for post in others limit: 6 -%}
+  {%- for post in posts_list -%}
     <article>
       <header>
         <span class="date">{{ post.date | date: '%B %d, %Y' }}</span>
@@ -72,16 +85,38 @@ wrap_inner: false
   {%- endfor -%}
 </section>
 
+{%- if paginator -%}
 <!-- Seção: Paginação -->
 <footer>
   <div class="pagination">
-    <a href="#" class="page active">1</a>
-    <a href="#" class="page">2</a>
-    <a href="#" class="page">3</a>
-    <span class="extra">&hellip;</span>
-    <a href="#" class="page">8</a>
-    <a href="#" class="page">9</a>
-    <a href="#" class="page">10</a>
-    <a href="#" class="next">Next</a>
+    {%- if paginator.previous_page -%}
+      <a href="{{ paginator.previous_page_path | relative_url }}" class="prev">Anterior</a>
+    {%- else -%}
+      <span class="prev disabled">Anterior</span>
+    {%- endif -%}
+
+    {%- assign paginate_path = site.paginate_path | default: '/page/:num/' -%}
+    {%- for page_number in (1..paginator.total_pages) -%}
+      {%- if page_number == 1 -%}
+        {%- assign page_url = '/' -%}
+      {%- else -%}
+        {%- capture page_url -%}
+          {{ paginate_path | replace: ':num', page_number }}
+        {%- endcapture -%}
+      {%- endif -%}
+
+      {%- if page_number == paginator.page -%}
+        <span class="page active">{{ page_number }}</span>
+      {%- else -%}
+        <a href="{{ page_url | relative_url }}" class="page">{{ page_number }}</a>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if paginator.next_page -%}
+      <a href="{{ paginator.next_page_path | relative_url }}" class="next">Próximo</a>
+    {%- else -%}
+      <span class="next disabled">Próximo</span>
+    {%- endif -%}
   </div>
 </footer>
+{%- endif -%}

@@ -15,7 +15,11 @@ collections:
     output: true
 
 excerpt_separator: "<!--more-->"
-plugins: []
+plugins:
+  - jekyll-paginate
+
+paginate: 7
+paginate_path: "/page/:num/"
 
 defaults:
   - scope:
