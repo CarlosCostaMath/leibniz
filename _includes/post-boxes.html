@@ -5,71 +5,71 @@ Veja _posts/2025-10-23-guia-recursos-posts.md para exemplos de uso
 
 {% assign animation = include.animation | default: 'fade-up' %}
 {% assign delay = include.delay %}
-{% capture delay_attr %}{% if delay %} data-animate-delay="{{ delay }}"{% endif %}{% endcapture %}
 
-{% case include.type %}
-{% when 'quote' %}
-  <!-- Caixa destacada de citação -->
-  <div class="quote-box post-box" data-animate="{{ animation }}"{{ delay_attr }}>
+{% if include.type == "quote" %}
+<div class="quote-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
     {{ include.content | markdownify }}
     {% if include.cite %}<cite>— {{ include.cite }}</cite>{% endif %}
-  </div>
-{% when 'glossary', 'definition' %}
-  <!-- Caixa de glossário para termos-chave -->
-  <div class="glossary-box post-box" data-animate="{{ animation }}"{{ delay_attr }}>
-    <h4>📖 {{ include.title | default: 'Definição' }}</h4>
+</div>
+{% endif %}
+
+{% if include.type == "glossary" or include.type == "definition" %}
+<div class="glossary-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <h4>📖 {{ include.title | default: "Definição" }}</h4>
     {{ include.content | markdownify }}
-  </div>
-{% when 'concept' %}
-  <!-- Destaque para conceitos importantes -->
-  <div class="concept-box post-box" data-animate="{{ animation }}"{{ delay_attr }}>
+</div>
+{% endif %}
+
+{% if include.type == "concept" %}
+<div class="concept-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
     <h4>{{ include.title }}</h4>
     {{ include.content | markdownify }}
-  </div>
-{% when 'concept-grid-start' %}
-  <!-- Início da grade de conceitos relacionados -->
-  <div class="concept-grid" data-animate="{{ animation }}"{{ delay_attr }}>
-{% when 'concept-grid-end' %}
-  <!-- Fim da grade de conceitos relacionados -->
-  </div>
-{% when 'timeline-start' %}
-  <!-- Início da linha do tempo do conteúdo -->
-  <div class="timeline" data-animate="{{ animation }}"{{ delay_attr }}>
-{% when 'timeline-item' %}
-  {% assign timeline_animation = include.animation | default: animation | default: 'timeline' %}
-  {% assign timeline_delay_value = include.delay | default: delay %}
-  {% capture timeline_delay_attr %}{% if timeline_delay_value %} data-animate-delay="{{ timeline_delay_value }}"{% endif %}{% endcapture %}
-  <!-- Marco individual da linha do tempo -->
-  <div class="timeline-item post-box" data-animate="{{ timeline_animation }}"{{ timeline_delay_attr }}>
-    {% if include.year or include.title %}
-      <h4>{% if include.year %}{{ include.year }} - {% endif %}{{ include.title }}</h4>
-    {% endif %}
+</div>
+{% endif %}
+
+{% if include.type == "concept-grid-start" %}
+<div class="concept-grid" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+{% endif %}
+
+{% if include.type == "concept-grid-end" %}
+</div>
+{% endif %}
+
+{% if include.type == "timeline-start" %}
+<div class="timeline" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+{% endif %}
+
+{% if include.type == "timeline-item" %}
+    <div class="timeline-item post-box" data-animate="{{ include.animation | default: 'timeline' }}"{% if include.delay %} data-animate-delay="{{ include.delay }}"{% endif %}>
+        {% if include.year or include.title %}<h4>{% if include.year %}{{ include.year }} - {% endif %}{{ include.title }}</h4>{% endif %}
+        {{ include.content | markdownify }}
+    </div>
+{% endif %}
+
+{% if include.type == "timeline-end" %}
+</div>
+{% endif %}
+
+{% if include.type == "example" %}
+<div class="example-box post-box" data-animate="{{ animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <h4>📝 {{ include.title | default: "Exemplo" }}</h4>
     {{ include.content | markdownify }}
-  </div>
-{% when 'timeline-end' %}
-  <!-- Encerramento da linha do tempo -->
-  </div>
-{% when 'example' %}
-  <!-- Caixa para exemplos práticos -->
-  <div class="example-box post-box" data-animate="{{ animation }}"{{ delay_attr }}>
-    <h4>📝 {{ include.title | default: 'Exemplo' }}</h4>
-    {{ include.content | markdownify }}
-  </div>
-{% when 'image' %}
-  <!-- Ilustração destacada no corpo do texto -->
-  {% assign position = include.position | default: 'center' %}
-  {% if include.animation %}
-    {% assign image_animation = include.animation %}
-  {% elsif position == 'left' %}
-    {% assign image_animation = 'slide-in-left' %}
-  {% elsif position == 'right' %}
-    {% assign image_animation = 'slide-in-right' %}
-  {% else %}
-    {% assign image_animation = 'zoom-in' %}
-  {% endif %}
-  {% capture loading_attr %}{% if position != 'center' %}loading="lazy"{% else %}loading="eager"{% endif %}{% endcapture %}
-  <figure class="post-image {{ position }}" data-animate="{{ image_animation }}"{{ delay_attr }}>
-    <img src="{{ include.src | relative_url }}" alt="{{ include.alt | default: '' }}" {{ loading_attr }}>
+</div>
+{% endif %}
+
+{% if include.type == "image" %}
+{% assign position = include.position | default: 'center' %}
+{% if include.animation %}
+  {% assign image_animation = include.animation %}
+{% elsif position == 'left' %}
+  {% assign image_animation = 'slide-in-left' %}
+{% elsif position == 'right' %}
+  {% assign image_animation = 'slide-in-right' %}
+{% else %}
+  {% assign image_animation = 'zoom-in' %}
+{% endif %}
+<figure class="post-image {{ position }}" data-animate="{{ image_animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
+    <img src="{{ include.src | relative_url }}" alt="{{ include.alt | default: '' }}" {% if position != 'center' %}loading="lazy"{% else %}loading="eager"{% endif %}>
     {% if include.caption %}<figcaption>{{ include.caption }}</figcaption>{% endif %}
-  </figure>
-{% endcase %}
+</figure>
+{% endif %}
