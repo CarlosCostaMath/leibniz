@@ -7,7 +7,7 @@
       "host": "example.com",
       "source": "seed",
       "published_at": "2025-10-31T12:00:00Z",
-      "brief_pt": "A seção News foi inicializada. Assim que a automação estiver ok, este conteúdo será substituído.",
+      "brief_pt": "A seção News foi inicializada. Assim que o agregador rodar, este conteúdo será substituído.",
       "brief_en": "Seed item."
     }
   ]
