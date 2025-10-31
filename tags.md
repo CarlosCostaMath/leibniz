@@ -28,7 +28,7 @@ extra_css:
         {%- assign slug = name | slugify -%}
         <li>
           <a class="button small outline"
-             href="{{ '/tag/' | relative_url }}?t={{ slug }}">
+             href="{{ '/tag/' | append: slug | append: '/' | relative_url }}">
             #{{ name }}
           </a>
         </li>

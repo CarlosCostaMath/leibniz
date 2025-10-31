@@ -1,0 +1,120 @@
+---
+layout: default
+---
+{% include breadcrumb.html %}
+
+{%- assign posts_list = page.posts | default: site.posts -%}
+{%- assign posts_list = posts_list | sort: 'date' | reverse -%}
+
+<section class="post taxonomy-page" id="taxonomy-archive">
+  <header class="major taxonomy-header">
+    <h1>
+      {%- if page.title -%}
+        {{ page.title }}
+      {%- elsif page.term -%}
+        {%- if page.type == 'tag' -%}#{{ page.term }}{%- else -%}{{ page.term }}{%- endif -%}
+      {%- else -%}
+        Arquivo
+      {%- endif -%}
+    </h1>
+    <p class="dek">
+      {%- if page.type == 'tag' -%}
+        Publicações marcadas com esta tag.
+      {%- elsif page.type == 'category' -%}
+        Publicações desta categoria.
+      {%- else -%}
+        Todas as publicações relacionadas.
+      {%- endif -%}
+    </p>
+  </header>
+
+  {%- if posts_list and posts_list.size > 0 -%}
+  <div class="taxonomy-grid">
+    {%- for post in posts_list -%}
+      {%- assign thumb = post.cover | default: post.hero_image | default: '/images/pic02.jpg' -%}
+      <article class="taxonomy-card">
+        <a class="taxonomy-link" href="{{ post.url | relative_url }}">
+          <div class="taxonomy-thumb">
+            <img src="{{ thumb | relative_url }}" alt="{{ post.title | default: 'Post' }}">
+          </div>
+          <div class="taxonomy-meta">
+            <time class="taxonomy-date" datetime="{{ post.date | date_to_xmlschema }}">
+              {{ post.date | date: "%d/%m/%Y" }}
+            </time>
+            <h2 class="taxonomy-title">{{ post.title | default: "(Sem título)" }}</h2>
+          </div>
+        </a>
+      </article>
+    {%- endfor -%}
+  </div>
+  {%- else -%}
+    <p class="empty-message">Ainda não há publicações para esta taxonomia.</p>
+  {%- endif -%}
+</section>
+
+<style>
+  #taxonomy-archive {
+    padding: 3rem 0;
+  }
+  #taxonomy-archive .taxonomy-header {
+    text-align: center;
+  }
+  #taxonomy-archive .taxonomy-header h1 {
+    margin-bottom: 0.5rem;
+  }
+  #taxonomy-archive .taxonomy-header .dek {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  #taxonomy-archive .taxonomy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+  #taxonomy-archive .taxonomy-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  #taxonomy-archive .taxonomy-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  }
+  #taxonomy-archive .taxonomy-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  #taxonomy-archive .taxonomy-thumb {
+    aspect-ratio: 16 / 9;
+    background: #f5f5f5;
+  }
+  #taxonomy-archive .taxonomy-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #taxonomy-archive .taxonomy-meta {
+    padding: 1.25rem;
+  }
+  #taxonomy-archive .taxonomy-date {
+    display: block;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  #taxonomy-archive .taxonomy-title {
+    font-size: 1.25rem;
+    line-height: 1.35;
+    margin: 0;
+  }
+  #taxonomy-archive .empty-message {
+    text-align: center;
+    color: #666;
+  }
+</style>
