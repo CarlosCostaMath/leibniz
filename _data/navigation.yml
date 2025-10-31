@@ -17,3 +17,10 @@
   url: "/sobre/"
   section: "about"
   match: "/sobre/"
+- title: ""
+  url: "/search/"
+  section: "search"
+  icon: "fa-search"
+  icon_style: "solid"
+  aria_label: "Buscar"
+  hide_in_footer: true
