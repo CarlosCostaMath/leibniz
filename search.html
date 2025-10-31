@@ -1,0 +1,83 @@
+---
+layout: default
+title: "Busca"
+nav_section: search
+body_classes: search-page
+wrap_inner: false
+permalink: /search/
+extra_js:
+  - /assets/js/search.js
+---
+
+{%- assign pageviews_entries = site.data.pageviews.posts | default: site.data.pageviews | default: [] -%}
+{%- assign sorted_pageviews = pageviews_entries | sort: 'views' | reverse -%}
+{%- assign popular_posts = '' | split: ',' -%}
+{%- for entry in sorted_pageviews -%}
+  {%- assign matched_post = site.posts | where: 'url', entry.url | first -%}
+  {%- if matched_post -%}
+    {%- assign popular_posts = popular_posts | push: matched_post -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign popular_size = popular_posts | size -%}
+{%- if popular_size == 0 -%}
+  {%- assign popular_posts = site.posts | sort: 'date' | reverse | slice: 0, 4 -%}
+{%- else -%}
+  {%- assign popular_posts = popular_posts | slice: 0, 4 -%}
+{%- endif -%}
+
+<section class="search-pane">
+  <div class="search-pane__inner">
+    <p class="search-pane__legend">DIGITE O(S) TERMO(S) E PRESSIONE ENTER</p>
+    <h1 class="search-pane__title">O que você está procurando?</h1>
+
+    <form
+      id="site-search-form"
+      class="search-form"
+      role="search"
+      aria-label="Pesquisar no site"
+      data-endpoint="{{ '/search.json' | relative_url }}"
+    >
+      <label class="sr-only" for="search-input">Buscar por conteúdo</label>
+      <div class="search-form__field">
+        <input
+          id="search-input"
+          type="search"
+          name="q"
+          placeholder="Busque por artigos, categorias ou tags"
+          autocomplete="off"
+          spellcheck="false"
+          required
+        />
+        <button type="submit" class="search-form__button" aria-label="Buscar">
+          <span class="icon solid fa-search" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="search-form__hint">Pressione Enter para ver os resultados</p>
+    </form>
+
+    <div class="search-pane__divider" role="presentation"></div>
+
+    <div id="search-feedback" class="search-feedback" aria-live="polite">
+      Comece digitando para encontrar conteúdos.
+    </div>
+
+    <div id="search-results" class="search-results" aria-live="polite"></div>
+
+    <section class="search-popular" aria-label="Posts mais visitados">
+      <p class="search-popular__legend">Mais visitados</p>
+      <div class="search-popular__grid">
+        {%- assign posts_count = popular_posts | size -%}
+        {%- if posts_count > 0 -%}
+          {%- for post in popular_posts -%}
+          <a class="search-popular__item" href="{{ post.url | relative_url }}">
+            <span class="search-popular__title">{{ post.title }}</span>
+            <span class="search-popular__arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          {%- endfor -%}
+        {%- else -%}
+          <p class="search-popular__empty">Ainda não há posts populares para exibir.</p>
+        {%- endif -%}
+      </div>
+    </section>
+  </div>
+</section>
