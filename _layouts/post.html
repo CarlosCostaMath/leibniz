@@ -1,61 +1,76 @@
 ---
 layout: default
 ---
+{% comment %}Configuração dos controles interativos do post{% endcomment %}
 {% assign share_text = page.description | default: page.excerpt | default: site.description %}
-<!-- CSS Específico para Posts Modernos -->
+{% assign share_text_attr = share_text | strip_html | normalize_whitespace | escape %}
+{% assign show_nav_bar = page.enable_nav_bar != false %}
+{% assign allow_font_control = page.enable_font_control != false %}
+{% assign allow_share = page.enable_share != false %}
+{% assign allow_toc = page.enable_toc != false %}
+{% assign has_desktop_controls = allow_font_control or allow_share or allow_toc %}
+{% assign has_mobile_controls = has_desktop_controls %}
+{% assign has_controls = has_desktop_controls %}
+{% capture share_data_attr %}{% if allow_share and share_text_attr %} data-share-text="{{ share_text_attr }}"{% endif %}{% endcapture %}
 
-
-<!-- Breadcrumb (opcional; criamos um stub no passo 2) -->
-
-<!-- Barra de Navegação Flutuante -->
-{% if page.enable_nav_bar != false %}
-<div class="post-nav-bar">
-  <div class="reading-progress" id="readingProgress"></div>
-  <div class="post-nav-content">
-    <div class="post-nav-title">{{ page.title }}</div>
-    <div class="post-nav-actions">
-      {% if page.enable_font_control != false %}
-      <button class="post-nav-btn desktop-only" id="fontDecrease" title="Diminuir fonte" aria-label="Diminuir fonte">A-</button>
-      <button class="post-nav-btn desktop-only" id="fontIncrease" title="Aumentar fonte" aria-label="Aumentar fonte">A+</button>
+{% if show_nav_bar %}
+  <!-- Barra de navegação com progresso de leitura -->
+  <div class="post-nav-bar">
+    <div class="reading-progress" id="readingProgress"></div>
+    <div class="post-nav-content">
+      <div class="post-nav-title">{{ page.title }}</div>
+      {% if has_controls %}
+        <div class="post-nav-actions">
+          {% if allow_font_control %}
+            <button class="post-nav-btn desktop-only" id="fontDecrease" title="Diminuir fonte" aria-label="Diminuir fonte">A-</button>
+            <button class="post-nav-btn desktop-only" id="fontIncrease" title="Aumentar fonte" aria-label="Aumentar fonte">A+</button>
+          {% endif %}
+          {% if allow_share %}
+            <button class="post-nav-btn desktop-only" id="shareButton" title="Compartilhar" aria-label="Compartilhar"{{ share_data_attr }}>
+              <i class="fas fa-share-alt" aria-hidden="true"></i>
+            </button>
+          {% endif %}
+          {% if allow_toc %}
+            <button class="post-nav-btn desktop-only" id="tocToggle" title="Índice" aria-label="Abrir índice">☰</button>
+          {% endif %}
+          {% if has_mobile_controls %}
+            <button class="post-nav-btn mobile-only" id="mobileMenuToggle" title="Menu" aria-label="Abrir menu">
+              <span class="hamburger-icon">⋮</span>
+            </button>
+          {% endif %}
+        </div>
+        {% if has_mobile_controls %}
+          <div class="mobile-nav-menu" id="mobileNavMenu">
+            {% if allow_font_control %}
+              <button class="nav-btn" id="mobileFontDecrease" title="Diminuir fonte">A-</button>
+              <button class="nav-btn" id="mobileFontIncrease" title="Aumentar fonte">A+</button>
+            {% endif %}
+            {% if allow_share %}
+              <button class="nav-btn" id="mobileShareButton" title="Compartilhar"{{ share_data_attr }}>
+                <i class="fas fa-share-alt"></i>
+              </button>
+            {% endif %}
+            {% if allow_toc %}
+              <button class="nav-btn" id="mobileTocToggle" title="Índice">☰</button>
+            {% endif %}
+          </div>
+        {% endif %}
       {% endif %}
-      {% if page.enable_share != false %}
-      <button class="post-nav-btn desktop-only" id="shareButton" title="Compartilhar" aria-label="Compartilhar" data-share-text="{{ share_text | strip_html | normalize_whitespace | escape }}">
-      <i class="fas fa-share-alt" aria-hidden="true"></i></button>
-      {% endif %}
-      {% if page.enable_toc != false %}
-      <button class="post-nav-btn desktop-only" id="tocToggle" title="Índice" aria-label="Abrir índice">☰</button>
-      {% endif %}
-      <button class="post-nav-btn mobile-only" id="mobileMenuToggle" title="Menu" aria-label="Abrir menu">
-      <span class="hamburger-icon">⋮</span>
-      </button>
     </div>
-    <div class="mobile-nav-menu" id="mobileNavMenu">
-      {% if page.enable_font_control != false %}
-      <button class="nav-btn" id="mobileFontDecrease" title="Diminuir fonte">A-</button>
-      <button class="nav-btn" id="mobileFontIncrease" title="Aumentar fonte">A+</button>
-      {% endif %}
-      {% if page.enable_share != false %}
-      <button class="nav-btn" id="mobileShareButton" title="Compartilhar" data-share-text="{{ share_text | strip_html | normalize_whitespace | escape }}">
-      <i class="fas fa-share-alt"></i></button>
-      {% endif %}
-      {% if page.enable_toc != false %}
-      <button class="nav-btn" id="mobileTocToggle" title="Índice">☰</button>
-      {% endif %}
-    </div>
+    {% if allow_toc %}
+      <div class="toc-dropdown" id="tocDropdown">
+        <h3>Índice do Artigo</h3>
+        <ul id="tocList"></ul>
+      </div>
+    {% endif %}
   </div>
-  {% if page.enable_toc != false %}
-  <div class="toc-dropdown" id="tocDropdown">
-    <h3>Índice do Artigo</h3>
-    <ul id="tocList"></ul>
-  </div>
-  {% endif %}
-</div>
 {% endif %}
 
+<!-- Estrutura principal do conteúdo do post -->
 <article class="post-article">
-    <!-- Hero Image (fallback: hero_image → cover) -->
-    {% assign hero = page.hero_image | default: page.cover %}
-    {% if hero %}
+  {% assign hero = page.hero_image | default: page.cover %}
+  {% if hero %}
+    <!-- Imagem de destaque do post -->
     <div class="post-hero-image" data-animate="reveal">
       <img src="{{ hero | relative_url }}" alt="{{ page.title }}" loading="eager">
       {% if page.hero_caption %}
@@ -64,67 +79,73 @@ layout: default
         </div>
       {% endif %}
     </div>
-    {% endif %}
+  {% endif %}
   <header>
+    <!-- Categorias do post -->
     {% if page.categories %}
-    <div class="post-categories" data-animate="fade-up">
-      {% for category in page.categories %}
-        <a href="{{ '/category/' | relative_url }}?c={{ category | slugify }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
-      {% endfor %}
-    </div>
+      <div class="post-categories" data-animate="fade-up">
+        {% for category in page.categories %}
+          <a href="{{ '/category/' | relative_url }}?c={{ category | slugify }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+        {% endfor %}
+      </div>
     {% endif %}
 
+    <!-- Título e subtítulo principais -->
     <h1 data-animate="fade-up">{{ page.title }}</h1>
 
     {% if page.subtitle %}
-    <p class="post-subtitle" data-animate="fade-up">{{ page.subtitle }}</p>
+      <p class="post-subtitle" data-animate="fade-up">{{ page.subtitle }}</p>
     {% endif %}
 
+    <!-- Descrição introdutória do post -->
     {% if page.description %}
-    <div class="post-description" data-animate="fade-up">{{ page.description }}</div>
+      <div class="post-description" data-animate="fade-up">{{ page.description }}</div>
     {% endif %}
 
+    <!-- Metadados de autoria e tempo de leitura -->
     <div class="post-meta" data-animate="fade-in">
       <span><strong>Por:</strong> {{ page.author | default: site.author | default: 'Carlos Costa' }}</span>
       <span class="separator">•</span>
       <span><strong>Data:</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d de %B de %Y" }}</time></span>
       {% if page.reading_time %}
-      <span class="separator">•</span>
-      <span><strong>Leitura:</strong> {{ page.reading_time }}</span>
+        <span class="separator">•</span>
+        <span><strong>Leitura:</strong> {{ page.reading_time }}</span>
       {% endif %}
     </div>
   </header>
 
+  <!-- Corpo principal do post -->
   <div class="post-content">
     {{ content }}
   </div>
 
+  <!-- Rodapé com tags e retorno -->
   <footer class="post-footer" data-animate="fade-in">
     {% if page.tags %}
-    <div class="post-tags" data-animate="fade-up">
-      <strong>Tags:</strong>
-      {% for tag in page.tags %}
-        <a href="{{ '/tag/' | relative_url }}?t={{ tag | slugify }}">#{{ tag }}</a>
-      {% endfor %}
-    </div>
+      <div class="post-tags" data-animate="fade-up">
+        <strong>Tags:</strong>
+        {% for tag in page.tags %}
+          <a href="{{ '/tag/' | relative_url }}?t={{ tag | slugify }}">#{{ tag }}</a>
+        {% endfor %}
+      </div>
     {% endif %}
 
     <ul class="actions">
-      <!-- Se não tiver seção /blog/, volte para a raiz -->
       <li><a href="{{ '/' | relative_url }}" class="button primary">← Voltar</a></li>
     </ul>
   </footer>
 </article>
 
-<!-- Lightbox -->
+<!-- Lightbox de imagens do post -->
 {% if page.enable_lightbox != false %}
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lightboxClose">×</button>
-  <img src="" alt="" id="lightboxImage">
-</div>
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">×</button>
+    <img src="" alt="" id="lightboxImage">
+  </div>
 {% endif %}
 
-<!-- Back to Top -->
+<!-- Atalho para voltar ao topo -->
 <a href="#" class="back-to-top" id="backToTop">↑</a>
 
+<!-- Funcionalidades extras do post -->
 <script src="{{ '/assets/js/post-enhancements.js' | relative_url }}" defer></script>

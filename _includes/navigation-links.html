@@ -1,0 +1,55 @@
+{%- comment -%}
+  Renderiza uma lista de links de navegação reutilizável.
+  Parâmetros opcionais:
+    - items: coleção de links (cada item deve possuir title/url e, opcionalmente, section/match)
+    - list_class: classe adicionada à tag <ul>
+    - apply_active: quando verdadeiro, avalia estados "active" com base na página atual
+    - fallback: string separada por vírgula usada caso não existam itens (section|url|label|match)
+{%- endcomment -%}
+
+{%- comment -%}Coleção principal de links de navegação{%- endcomment -%}
+{%- assign nav_items = include.items | default: site.data.navigation -%}
+{%- assign list_class = include.list_class -%}
+{%- assign apply_active = include.apply_active | default: false -%}
+{%- assign fallback_string = include.fallback | default: 'home|/|Início|,archives|/archives/|Arquivos|/archives/,tags|/tags/|Tags|/tags/,categories|/categories/|Categorias|/categories/,about|/sobre/|Sobre|/sobre/' -%}
+
+<ul{% if list_class %} class="{{ list_class }}"{% endif %}>
+  {%- if nav_items and nav_items.size > 0 -%}
+    {%- comment -%}Iteração dos links fornecidos explicitamente{%- endcomment -%}
+    {%- for item in nav_items -%}
+      {%- capture nav_class -%}
+        {%- if apply_active -%}
+          {%- if item.section and page.nav_section == item.section -%} class="active"
+          {%- elsif item.match and page.url contains item.match -%} class="active"
+          {%- elsif item.url and page.url == item.url -%} class="active"
+          {%- endif -%}
+        {%- endif -%}
+      {%- endcapture -%}
+      <li{{ nav_class | strip }}>
+        <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+      </li>
+    {%- endfor -%}
+  {%- else -%}
+    {%- comment -%}Fallback padrão quando nenhum menu customizado é informado{%- endcomment -%}
+    {%- assign fallback_nav = fallback_string | split: ',' -%}
+    {%- for entry in fallback_nav -%}
+      {%- assign parts = entry | split: '|' -%}
+      {%- assign section = parts[0] -%}
+      {%- assign url = parts[1] -%}
+      {%- assign label = parts[2] -%}
+      {%- assign match = parts[3] -%}
+      {%- capture fallback_class -%}
+        {%- if apply_active -%}
+          {%- if page.nav_section == section -%} class="active"
+          {%- elsif match and page.url contains match -%} class="active"
+          {%- elsif section == 'home' and page.url == '/' -%} class="active"
+          {%- elsif not match and page.url == url -%} class="active"
+          {%- endif -%}
+        {%- endif -%}
+      {%- endcapture -%}
+      <li{{ fallback_class | strip }}>
+        <a href="{{ url | relative_url }}">{{ label }}</a>
+      </li>
+    {%- endfor -%}
+  {%- endif -%}
+</ul>
