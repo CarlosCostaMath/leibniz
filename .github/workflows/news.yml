@@ -1,67 +1,47 @@
-name: Build News JSON
+name: Make news.json
 
 on:
-  schedule:
-    - cron: "0 * * * *"      # opcional: a cada hora
-  workflow_dispatch: {}       # permite rodar manualmente
+  workflow_dispatch: {}         # botão "Run workflow"
+  push:                         # roda quando você fizer qualquer commit no main
+    branches: [ main ]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  build-news:
+  make-news:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Show repo tree (debug)
+      # cria um news.json simples (apenas para a página /news não quebrar)
+      - name: Create seed news.json
         run: |
-          pwd
-          ls -la
-          ls -la scripts || true
-          ls -la news || true
+          mkdir -p news
+          cat > news/news.json << 'JSON'
+          {
+            "updated_at": "2025-10-31T12:00:00Z",
+            "items": [
+              {
+                "title": "News habilitada",
+                "url": "https://example.com",
+                "host": "example.com",
+                "source": "seed",
+                "published_at": "2025-10-31T12:00:00Z",
+                "brief_pt": "A seção News foi inicializada. Assim que o agregador rodar, este conteúdo será substituído.",
+                "brief_en": "Seed item."
+              }
+            ]
+          }
+          JSON
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Verify Python
-        run: |
-          python -V
-          python - << 'PY'
-import sys, json
-print("Python OK, version:", sys.version)
-PY
-
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install "requests==2.32.3" "feedparser==6.0.11"
-          # Se quiser tradução offline depois: pip install argostranslate
-
-      - name: Check script exists
-        run: |
-          test -f scripts/aggregate_news.py || (echo "ERRO: scripts/aggregate_news.py não encontrado" && exit 1)
-
-      - name: Run generator
-        env:
-          USE_ARGOS: "false"   # primeiro rodamos sem tradução offline
-        run: |
-          set -e
-          python scripts/aggregate_news.py
-          echo "Conteúdo gerado:"
-          ls -la news || true
-          test -f news/news.json && head -n 40 news/news.json || (echo "ERRO: news/news.json não foi criado" && exit 1)
-
-      # Em vez de 'git push' direto, abrimos um PR (funciona com branch protegido)
+      # Em vez de dar 'push' direto (que pode ser bloqueado),
+      # abrimos um Pull Request automático. Você só clica "Merge".
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore(news): update news.json"
-          title: "Update news.json"
-          body: "Automated update by Build News JSON workflow."
-          branch: "bot/news-update"
+          commit-message: "chore(news): add/update news.json"
+          title: "Add/update news.json"
+          body: "Automated seed for /news."
+          branch: "bot/news-seed"
