@@ -2,34 +2,66 @@ name: Build News JSON
 
 on:
   schedule:
-    - cron: "0 * * * *"      # atualiza a cada hora
-  workflow_dispatch:
+    - cron: "0 * * * *"      # opcional: a cada hora
+  workflow_dispatch: {}       # permite rodar manualmente
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build-news:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show repo tree (debug)
+        run: |
+          pwd
+          ls -la
+          ls -la scripts || true
+          ls -la news || true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify Python
+        run: |
+          python -V
+          python - << 'PY'
+import sys, json
+print("Python OK, version:", sys.version)
+PY
+
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install requests feedparser argostranslate
-      - name: Generate news JSON
+          pip install "requests==2.32.3" "feedparser==6.0.11"
+          # Se quiser tradução offline depois: pip install argostranslate
+
+      - name: Check script exists
         run: |
+          test -f scripts/aggregate_news.py || (echo "ERRO: scripts/aggregate_news.py não encontrado" && exit 1)
+
+      - name: Run generator
+        env:
+          USE_ARGOS: "false"   # primeiro rodamos sem tradução offline
+        run: |
+          set -e
           python scripts/aggregate_news.py
-      - name: Commit & push
-        run: |
-          if [ -n "$(git status --porcelain news/news.json)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add news/news.json
-            git commit -m "chore(news): update news.json [skip ci]"
-            git push
-          else
-            echo "No changes."
-          fi
+          echo "Conteúdo gerado:"
+          ls -la news || true
+          test -f news/news.json && head -n 40 news/news.json || (echo "ERRO: news/news.json não foi criado" && exit 1)
+
+      # Em vez de 'git push' direto, abrimos um PR (funciona com branch protegido)
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(news): update news.json"
+          title: "Update news.json"
+          body: "Automated update by Build News JSON workflow."
+          branch: "bot/news-update"
