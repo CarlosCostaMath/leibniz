@@ -54,31 +54,9 @@
           {%- assign socials = site.social | default: site.social_links -%}
           {%- if socials -%}
             {%- for item in socials -%}
-              {%- assign icon_style = item.style | default: 'brands' -%}
-              {%- assign raw_url = item.url | default: '#' -%}
-              {%- assign is_external = raw_url contains '://' -%}
-              {%- if is_external -%}
-                {%- assign final_url = raw_url -%}
-              {%- else -%}
-                {%- assign final_url = raw_url | relative_url -%}
-              {%- endif -%}
-              <li>
-                <a
-                  href="{{ final_url }}"
-                  class="icon {{ icon_style }} {{ item.icon }}"
-                  {%- if is_external -%}
-                    target="{{ item.target | default: '_blank' }}"
-                    rel="{{ item.rel | default: 'noopener noreferrer' }}"
-                  {%- elsif item.rel -%}
-                    rel="{{ item.rel }}"
-                  {%- endif -%}
-                  aria-label="{{ item.aria_label | default: item.label | default: item.icon }}"
-                >
-                  <span class="label">{{ item.label | default: item.icon }}</span>
-                </a>
-              </li>
+              <li><a href="{{ item.url }}" class="icon brands {{ item.icon }}" rel="noopener"><span class="label">{{ item.label | default: item.icon }}</span></a></li>
             {%- endfor -%}
-          {%- else -%}
+          {%- else -%}	
 		   <li><a href="{{ '/contato/' | relative_url }}"
 				  class="icon solid fa-envelope"
 			      aria-label="Contato"></a></li>
