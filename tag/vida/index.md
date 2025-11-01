@@ -1,11 +1,11 @@
 ---
 layout: taxonomy
-title: "#Obras"
+title: "#Vida"
 taxonomy_type: tag
-taxonomy_term: Obras
-taxonomy_slug: obras
-permalink: "/tag/obras/"
-description: '1 publicação marcada com #Obras.'
+taxonomy_term: Vida
+taxonomy_slug: vida
+permalink: "/tag/vida/"
+description: '1 publicação marcada com #Vida.'
 extra_css:
 - "/assets/css/taxonomy.css"
 posts:

@@ -1,11 +1,11 @@
 ---
 layout: taxonomy
-title: "#Leibniz"
+title: "#História"
 taxonomy_type: tag
-taxonomy_term: Leibniz
-taxonomy_slug: leibniz
-permalink: "/tag/leibniz/"
-description: '1 publicação marcada com #Leibniz.'
+taxonomy_term: História
+taxonomy_slug: historia
+permalink: "/tag/historia/"
+description: '1 publicação marcada com #História.'
 extra_css:
 - "/assets/css/taxonomy.css"
 posts:
