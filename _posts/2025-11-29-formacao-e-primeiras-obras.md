@@ -12,7 +12,7 @@ reading_time: "7 min de leitura"
 categories:
 - História
 tags:
-- Leibniz
+- Vida
 - Obras
 - Formação
 ---
