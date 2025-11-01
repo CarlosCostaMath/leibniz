@@ -6,6 +6,7 @@ require 'fileutils'
 require 'set'
 require 'time'
 require 'psych'
+require 'date'
 
 ROOT = File.expand_path('..', __dir__)
 POSTS_DIR = File.join(ROOT, '_posts')
@@ -57,38 +58,47 @@ module Taxonomy
   module_function
 
   def collect_posts
-    posts = Dir.glob(File.join(POSTS_DIR, '*.{md,markdown}'))
-    posts.each_with_object({ tag: Hash.new { |h, k| h[k] = [] }, category: Hash.new { |h, k| h[k] = [] } }) do |path, acc|
-      content = File.read(path)
-      data = FrontMatter.load(content)
+    posts = Dir.glob(File.join(POSTS_DIR, '**', '*.{md,markdown}'), File::FNM_CASEFOLD)
+    errors = []
 
-      title = data['title'].to_s.strip
-      date = parse_date(data['date']) || date_from_filename(path)
-      permalink = build_permalink(data, path, date)
-      next unless permalink
+    groups = {
+      tag: Hash.new { |h, k| h[k] = [] },
+      category: Hash.new { |h, k| h[k] = [] }
+    }
 
-      payload = {
-        'title' => title.empty? ? '(Sem título)' : title,
-        'date' => date,
-        'url' => permalink,
-        'hero_image' => preferred_image(data),
-        'cover' => data['cover']
-      }
+    result = posts.each_with_object(groups) do |path, acc|
+      begin
+        content = File.read(path)
+        data = FrontMatter.load(content)
 
-      Array(data['tags']).each do |tag|
-        label = tag.to_s.strip
-        next if label.empty?
+        title = data['title'].to_s.strip
+        date = parse_date(data['date']) || date_from_filename(path)
+        permalink = build_permalink(data, path, date)
+        next unless permalink
 
-        acc[:tag][label] << payload.dup
-      end
+        payload = {
+          'title' => title.empty? ? '(Sem título)' : title,
+          'date' => date,
+          'url' => permalink,
+          'hero_image' => preferred_image(data),
+          'cover' => data['cover']
+        }
 
-      Array(data['categories']).each do |category|
-        label = category.to_s.strip
-        next if label.empty?
+        taxonomy_terms(data, 'tags', 'tag').each do |tag|
+          acc[:tag][tag] << payload.dup
+        end
 
-        acc[:category][label] << payload.dup
+        taxonomy_terms(data, 'categories', 'category').each do |category|
+          acc[:category][category] << payload.dup
+        end
+      rescue StandardError => e
+        errors << { path: path, error: e }
       end
     end
+
+    report_errors(errors)
+
+    result
   end
 
   def preferred_image(data)
@@ -108,11 +118,8 @@ module Taxonomy
     return nil if slug.nil? || slug.empty?
 
     segments = []
-    Array(data['categories']).each do |category|
-      label = category.to_s.strip
-      next if label.empty?
-
-      segments << Slug.latin_slug(label)
+    taxonomy_terms(data, 'categories', 'category').each do |category|
+      segments << Slug.latin_slug(category)
     end
 
     if date
@@ -270,6 +277,39 @@ module Taxonomy
 
     payload.delete('cover') if payload['cover'] == payload['hero_image']
     payload
+  end
+
+  def taxonomy_terms(data, *keys)
+    keys.flat_map do |key|
+      normalise_terms(data[key])
+    end
+        .map { |term| term.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+  end
+
+  def normalise_terms(value)
+    case value
+    when nil
+      []
+    when Array
+      value.flat_map { |item| normalise_terms(item) }
+    when String
+      value.split(',').map(&:strip)
+    else
+      Array(value)
+    end
+  end
+
+  def report_errors(errors)
+    return if errors.empty?
+
+    $stderr.puts 'Falha ao processar alguns posts:'
+    errors.each do |error|
+      $stderr.puts "  - #{error[:path]}: #{error[:error].class}: #{error[:error].message}"
+    end
+
+    raise 'não foi possível gerar todas as páginas de taxonomia'
   end
 end
 
