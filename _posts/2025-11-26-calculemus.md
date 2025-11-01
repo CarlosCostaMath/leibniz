@@ -12,7 +12,6 @@ reading_time: "12 min de leitura"
 categories:
 - História da Lógica
 tags:
-- Leibniz
 - Lógica
 - História
 ---
