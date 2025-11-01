@@ -6,6 +6,7 @@ require 'fileutils'
 require 'set'
 require 'time'
 require 'psych'
+require 'date'
 
 ROOT = File.expand_path('..', __dir__)
 POSTS_DIR = File.join(ROOT, '_posts')
@@ -57,38 +58,53 @@ module Taxonomy
   module_function
 
   def collect_posts
-    posts = Dir.glob(File.join(POSTS_DIR, '*.{md,markdown}'))
-    posts.each_with_object({ tag: Hash.new { |h, k| h[k] = [] }, category: Hash.new { |h, k| h[k] = [] } }) do |path, acc|
-      content = File.read(path)
-      data = FrontMatter.load(content)
+    posts = Dir.glob(File.join(POSTS_DIR, '**', '*.{md,markdown}'), File::FNM_CASEFOLD)
+    errors = []
 
-      title = data['title'].to_s.strip
-      date = parse_date(data['date']) || date_from_filename(path)
-      permalink = build_permalink(data, path, date)
-      next unless permalink
+    groups = {
+      tag: Hash.new { |h, k| h[k] = [] },
+      category: Hash.new { |h, k| h[k] = [] }
+    }
 
-      payload = {
-        'title' => title.empty? ? '(Sem título)' : title,
-        'date' => date,
-        'url' => permalink,
-        'hero_image' => preferred_image(data),
-        'cover' => data['cover']
-      }
+    result = posts.each_with_object(groups) do |path, acc|
+      begin
+        content = read_post(path)
+        data = FrontMatter.load(content)
 
-      Array(data['tags']).each do |tag|
-        label = tag.to_s.strip
-        next if label.empty?
+        title = data['title'].to_s.strip
+        date = parse_date(data['date']) || date_from_filename(path)
+        permalink = build_permalink(data, path, date)
+        next unless permalink
 
-        acc[:tag][label] << payload.dup
-      end
+        payload = {
+          'title' => title.empty? ? '(Sem título)' : title,
+          'date' => date,
+          'url' => permalink,
+          'hero_image' => preferred_image(data),
+          'cover' => data['cover']
+        }
 
-      Array(data['categories']).each do |category|
-        label = category.to_s.strip
-        next if label.empty?
+        taxonomy_terms(data, 'tags', 'tag').each do |tag|
+          acc[:tag][tag] << payload.dup
+        end
 
-        acc[:category][label] << payload.dup
+        taxonomy_terms(data, 'categories', 'category').each do |category|
+          acc[:category][category] << payload.dup
+        end
+      rescue StandardError => e
+        errors << { path: path, error: e, context: :collect }
       end
     end
+
+    [result, errors]
+  end
+
+  def read_post(path)
+    File.open(path, 'r:bom|utf-8') do |file|
+      file.read.encode('UTF-8', invalid: :replace, undef: :replace)
+    end
+  rescue EncodingError => e
+    raise EncodingError, "#{path}: não foi possível converter o conteúdo para UTF-8 (#{e.message})"
   end
 
   def preferred_image(data)
@@ -108,11 +124,8 @@ module Taxonomy
     return nil if slug.nil? || slug.empty?
 
     segments = []
-    Array(data['categories']).each do |category|
-      label = category.to_s.strip
-      next if label.empty?
-
-      segments << Slug.latin_slug(label)
+    taxonomy_terms(data, 'categories', 'category').each do |category|
+      segments << Slug.latin_slug(category)
     end
 
     if date
@@ -173,37 +186,45 @@ module Taxonomy
 
   def generate
     ensure_directories
-    taxonomies = collect_posts
+
+    taxonomies, read_errors = collect_posts
+    generation_errors = []
 
     taxonomies.each do |type, entries|
-      write_taxonomy(type, entries)
+      write_taxonomy(type, entries, generation_errors)
     end
+
+    report_errors(read_errors + generation_errors)
   end
 
-  def write_taxonomy(type, entries)
+  def write_taxonomy(type, entries, errors)
     base_dir = TAXONOMY_DIRS.fetch(type)
     keep_paths = Set.new
 
     entries.sort_by { |term, _| Slug.latin_slug(term) }.each do |term, documents|
       next if documents.empty?
 
-      slug = Slug.latin_slug(term)
-      dir = File.join(base_dir, slug)
-      FileUtils.mkdir_p(dir)
+      begin
+        slug = Slug.latin_slug(term)
+        dir = File.join(base_dir, slug)
+        FileUtils.mkdir_p(dir)
 
-      page_path = File.join(dir, 'index.md')
-      keep_paths << page_path
+        page_path = File.join(dir, 'index.md')
+        keep_paths << page_path
 
-      front_matter = build_front_matter(type, term, slug, documents)
-      content = front_matter_to_yaml(front_matter)
+        front_matter = build_front_matter(type, term, slug, documents)
+        content = front_matter_to_yaml(front_matter)
 
-      if !File.exist?(page_path) || File.read(page_path) != content
-        File.write(page_path, content)
-        puts "[#{type}] wrote #{page_path.sub(ROOT + '/', '')}"
+        if !File.exist?(page_path) || read_generated_page(page_path) != content
+          File.write(page_path, content, mode: 'w:UTF-8')
+          puts "[#{type}] wrote #{page_path.sub(ROOT + '/', '')}"
+        end
+      rescue StandardError => e
+        errors << { path: page_path || File.join(base_dir, Slug.latin_slug(term) || 'erro'), error: e, context: "#{type}:#{term}" }
       end
     end
 
-    remove_stale_entries(base_dir, keep_paths)
+    remove_stale_entries(base_dir, keep_paths, errors)
   end
 
   def build_front_matter(type, term, slug, documents)
@@ -242,7 +263,11 @@ module Taxonomy
     yaml
   end
 
-  def remove_stale_entries(base_dir, keep_paths)
+  def read_generated_page(path)
+    File.open(path, 'r:bom|utf-8') { |file| file.read }
+  end
+
+  def remove_stale_entries(base_dir, keep_paths, errors)
     Dir.glob(File.join(base_dir, '*')).each do |entry|
       next if File.basename(entry) == 'index.html'
 
@@ -250,8 +275,12 @@ module Taxonomy
         index_path = File.join(entry, 'index.md')
         next if keep_paths.include?(index_path)
 
-        FileUtils.rm_rf(entry)
-        puts "removed stale #{entry.sub(ROOT + '/', '')}"
+        begin
+          FileUtils.rm_rf(entry)
+          puts "removed stale #{entry.sub(ROOT + '/', '')}"
+        rescue StandardError => e
+          errors << { path: entry, error: e, context: :cleanup }
+        end
       end
     end
   end
@@ -270,6 +299,43 @@ module Taxonomy
 
     payload.delete('cover') if payload['cover'] == payload['hero_image']
     payload
+  end
+
+  def taxonomy_terms(data, *keys)
+    keys.flat_map do |key|
+      normalise_terms(data[key])
+    end
+        .map { |term| term.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+  end
+
+  def normalise_terms(value)
+    case value
+    when nil
+      []
+    when Array
+      value.flat_map { |item| normalise_terms(item) }
+    when String
+      value.split(',').map(&:strip)
+    else
+      Array(value)
+    end
+  end
+
+  def report_errors(errors)
+    return if errors.empty?
+
+    $stderr.puts 'Falha ao processar alguns posts:'
+    errors.each do |error|
+      location = error[:context] ? "#{error[:context]} (#{error[:path]})" : error[:path]
+      message = "  - #{location}: #{error[:error].class}: #{error[:error].message}"
+      $stderr.puts(message)
+      first_frame = Array(error[:error].backtrace).first
+      $stderr.puts("      ↳ #{first_frame}") if first_frame
+    end
+
+    raise 'não foi possível gerar todas as páginas de taxonomia'
   end
 end
 
