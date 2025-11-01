@@ -17,7 +17,7 @@ LAYOUT_NAME = 'taxonomy'
 EXTRA_CSS = ['/assets/css/taxonomy.css'].freeze
 
 class FrontMatter
-  FRONT_MATTER_REGEX = /\A---\s*\n(.*?)\n---\s*/m.freeze
+  FRONT_MATTER_REGEX = /\A---\s*\r?\n(.*?)\r?\n---\s*/m.freeze
 
   def self.load(content)
     match = content.match(FRONT_MATTER_REGEX)
