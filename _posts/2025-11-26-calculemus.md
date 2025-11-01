@@ -14,6 +14,7 @@ categories:
 tags:
 - Lógica
 - História
+- Computação
 ---
 
 ## O Filósofo dos Múltiplos Mundos e de Uma Só Lógica
