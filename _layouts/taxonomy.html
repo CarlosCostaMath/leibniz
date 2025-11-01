@@ -9,21 +9,13 @@ layout: default
   {%- assign is_tag = false -%}
 {%- endif -%}
 
-{%- assign posts = page.posts -%}
-
-{%- if posts and posts != empty -%}
-  {%- assign posts = posts | sort: 'date' | reverse -%}
+{%- assign posts = site.posts -%}
+{%- if is_tag -%}
+  {%- assign posts = posts | where_exp: 'post', "post.tags contains term" -%}
 {%- else -%}
-  {%- assign posts = site.posts -%}
-  {%- if is_tag -%}
-    {%- assign posts = posts | where_exp: 'post', "post.tags contains term" -%}
-  {%- else -%}
-    {%- assign posts = posts | where_exp: 'post', "post.categories contains term" -%}
-  {%- endif -%}
-  {%- if posts != empty -%}
-    {%- assign posts = posts | sort: 'date' | reverse -%}
-  {%- endif -%}
+  {%- assign posts = posts | where_exp: 'post', "post.categories contains term" -%}
 {%- endif -%}
+{%- assign posts = posts | sort: 'date' | reverse -%}
 
 {%- assign post_count = posts | size -%}
 
