@@ -254,11 +254,25 @@ module Taxonomy
   end
 
   def front_matter_to_yaml(data)
-    require 'yaml'
-    yaml = YAML.dump(data, indentation: 2, line_width: -1)
-    yaml = yaml.sub(/\A---\s*\n/, "---\n")
-    yaml << "---\n"
-    yaml
+    lines = ["---"]
+    lines << "layout: #{data['layout'].inspect}"
+    lines << "title: #{data['title'].inspect}"
+    lines << "taxonomy_type: #{data['taxonomy_type'].inspect}"
+    lines << "taxonomy_term: #{data['taxonomy_term'].inspect}"
+    lines << "taxonomy_slug: #{data['taxonomy_slug'].inspect}"
+    lines << "permalink: #{data['permalink'].inspect}"
+    lines << "description: #{data['description'].inspect}"
+    lines << "extra_css:"
+    data['extra_css'].each { |css| lines << "  - #{css.inspect}" }
+    lines << "posts:"
+    data['posts'].each do |post|
+      lines << "  - title: #{post['title'].inspect}"
+      lines << "    date: #{post['date'].inspect}"
+      lines << "    url: #{post['url'].inspect}"
+      lines << "    hero_image: #{post['hero_image'].inspect}" if post['hero_image']
+    end
+    lines << "---"
+    lines.join("\n") + "\n"
   end
 
   def read_generated_page(path)
