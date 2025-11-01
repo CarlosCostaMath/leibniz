@@ -5,7 +5,6 @@ require 'yaml'
 require 'fileutils'
 require 'set'
 require 'time'
-require 'psych'
 require 'date'
 
 ROOT = File.expand_path('..', __dir__)
@@ -209,7 +208,7 @@ module Taxonomy
         page_path = File.join(base_dir, "#{slug}.md")
         keep_paths << page_path
 
-        front_matter = build_front_matter(type, term, slug, documents)
+        front_matter = build_front_matter(type, term, slug, documents.size)
         content = front_matter_to_yaml(front_matter)
 
         if !File.exist?(page_path) || read_generated_page(page_path) != content
@@ -224,13 +223,7 @@ module Taxonomy
     remove_stale_entries(base_dir, keep_paths, errors)
   end
 
-  def build_front_matter(type, term, slug, documents)
-    sorted_docs = documents.sort_by { |doc| doc['date'] || Time.at(0) }.reverse
-    posts = sorted_docs.map do |doc|
-      serialise_post(doc)
-    end
-
-    count = posts.length
+  def build_front_matter(type, term, slug, count)
     count_text = count == 1 ? 'publicação' : 'publicações'
 
     description = if type == :tag
@@ -248,31 +241,17 @@ module Taxonomy
       'taxonomy_slug' => slug,
       'permalink' => "/#{type}/#{slug}/",
       'description' => description,
-      'extra_css' => EXTRA_CSS,
-      'posts' => posts
+      'extra_css' => EXTRA_CSS
+      # 'posts' foi REMOVIDO
     }
   end
 
   def front_matter_to_yaml(data)
-    lines = ["---"]
-    lines << "layout: #{data['layout'].inspect}"
-    lines << "title: #{data['title'].inspect}"
-    lines << "taxonomy_type: #{data['taxonomy_type'].inspect}"
-    lines << "taxonomy_term: #{data['taxonomy_term'].inspect}"
-    lines << "taxonomy_slug: #{data['taxonomy_slug'].inspect}"
-    lines << "permalink: #{data['permalink'].inspect}"
-    lines << "description: #{data['description'].inspect}"
-    lines << "extra_css:"
-    data['extra_css'].each { |css| lines << "  - #{css.inspect}" }
-    lines << "posts:"
-    data['posts'].each do |post|
-      lines << "  - title: #{post['title'].inspect}"
-      lines << "    date: #{post['date'].inspect}"
-      lines << "    url: #{post['url'].inspect}"
-      lines << "    hero_image: #{post['hero_image'].inspect}" if post['hero_image']
-    end
-    lines << "---"
-    lines.join("\n") + "\n"
+    require 'yaml'
+    yaml = YAML.dump(data, indentation: 2, line_width: -1)
+    yaml = yaml.sub(/\A---\s*\n/, "---\n")
+    yaml << "---\n"
+    yaml
   end
 
   def read_generated_page(path)
@@ -283,7 +262,7 @@ module Taxonomy
     # Remove arquivos .md que não estão mais em uso
     existing_md_files = Dir.glob(File.join(base_dir, '*.md'))
     stale_md_files = existing_md_files - keep_paths.to_a
-  
+
     stale_md_files.each do |file|
       begin
         File.unlink(file)
@@ -292,7 +271,7 @@ module Taxonomy
         errors << { path: file, error: e, context: :cleanup }
       end
     end
-  
+
     # Remove pastas antigas (legacy de index.md)
     Dir.glob(File.join(base_dir, '*')).each do |entry|
       next if File.basename(entry) == 'index.html'
@@ -305,22 +284,6 @@ module Taxonomy
         end
       end
     end
-  end
-
-  def serialise_post(doc)
-    payload = doc.each_with_object({}) do |(key, value), result|
-      next if value.nil?
-
-      result[key] = case key
-                    when 'date'
-                      value.respond_to?(:iso8601) ? value.iso8601 : value
-                    else
-                      value
-                    end
-    end
-
-    payload.delete('cover') if payload['cover'] == payload['hero_image']
-    payload
   end
 
   def taxonomy_terms(data, *keys)
