@@ -1,11 +1,11 @@
 ---
 layout: taxonomy
-title: "#Leibniz"
+title: "#Computação"
 taxonomy_type: tag
-taxonomy_term: Leibniz
-taxonomy_slug: leibniz
-permalink: "/tag/leibniz/"
-description: '1 publicação marcada com #Leibniz.'
+taxonomy_term: Computação
+taxonomy_slug: computacao
+permalink: "/tag/computacao/"
+description: '1 publicação marcada com #Computação.'
 extra_css:
 - "/assets/css/taxonomy.css"
 posts:
