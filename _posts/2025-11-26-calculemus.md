@@ -14,6 +14,7 @@ categories:
 tags:
 - Leibniz
 - Lógica
+- História
 ---
 
 ## O Filósofo dos Múltiplos Mundos e de Uma Só Lógica
