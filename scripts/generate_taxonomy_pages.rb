@@ -265,18 +265,28 @@ module Taxonomy
   end
 
   def remove_stale_entries(base_dir, keep_paths, errors)
+    # Remove arquivos .md que não estão mais em uso
+    existing_md_files = Dir.glob(File.join(base_dir, '*.md'))
+    stale_md_files = existing_md_files - keep_paths.to_a
+  
+    stale_md_files.each do |file|
+      begin
+        File.unlink(file)
+        puts "removed stale file #{file.sub(ROOT + '/', '')}"
+      rescue StandardError => e
+        errors << { path: file, error: e, context: :cleanup }
+      end
+    end
+  
+    # Remove pastas antigas (legacy de index.md)
     Dir.glob(File.join(base_dir, '*')).each do |entry|
       next if File.basename(entry) == 'index.html'
-
       if File.directory?(entry)
-        index_path = File.join(entry, 'index.md')
-        next if keep_paths.include?(index_path)
-
         begin
           FileUtils.rm_rf(entry)
-          puts "removed stale #{entry.sub(ROOT + '/', '')}"
+          puts "removed stale directory #{entry.sub(ROOT + '/', '')}"
         rescue StandardError => e
-          errors << { path: entry, error: e, context: :cleanup }
+          errors << { path: entry, error: e, context: :cleanup_dir }
         end
       end
     end
