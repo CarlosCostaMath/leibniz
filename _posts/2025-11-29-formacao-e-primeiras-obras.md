@@ -10,7 +10,7 @@ description: "Descubra a formação e as primeiras obras desse gigante do pensam
 author: Carlos Costa
 reading_time: "7 min de leitura"
 categories:
-- Vida e Obra
+- Biografia
 tags:
 - Vida
 - Obras
