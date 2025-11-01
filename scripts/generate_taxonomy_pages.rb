@@ -206,10 +206,7 @@ module Taxonomy
 
       begin
         slug = Slug.latin_slug(term)
-        dir = File.join(base_dir, slug)
-        FileUtils.mkdir_p(dir)
-
-        page_path = File.join(dir, 'index.md')
+        page_path = File.join(base_dir, "#{slug}.md")
         keep_paths << page_path
 
         front_matter = build_front_matter(type, term, slug, documents)
