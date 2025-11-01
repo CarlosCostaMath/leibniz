@@ -15,6 +15,7 @@ tags:
 - Vida
 - Obras
 - Formação
+- Nascimento
 ---
 
 ## Infância, Contexto Familiar e Primeira Educação
