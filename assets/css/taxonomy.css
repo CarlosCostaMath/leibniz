@@ -8,6 +8,15 @@
   max-width: 960px;
 }
 
+.taxonomy-archive {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2rem;
+  margin: 2rem auto;
+  max-width: 960px;
+}
+
 .taxonomy-header {
   display: block !important;
   text-align: center;
@@ -32,6 +41,15 @@
   margin: 0 0 2rem;
   padding: 0;
   list-style: none;
+}
+
+.taxonomy-empty {
+  text-align: center;
+  color: #555;
+}
+
+.taxonomy-list {
+  margin-top: 2rem;
 }
 
 .taxonomy-nav .button {
@@ -171,5 +189,11 @@ details[open] > .year-summary::before {
   .archive-link .thumb {
     width: 48px;
     height: 48px;
+  }
+}
+
+@media (max-width: 540px) {
+  .taxonomy-list {
+    margin-top: 1.5rem;
   }
 }

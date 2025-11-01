@@ -12,6 +12,9 @@ reading_time: "10 min de leitura"
 categories:
 - Filosofia da Linguagem
 tags:
+- Leibniz
+- Filosofia da Linguagem
+tags:
 - Línguas Artificiais
 - Línguas Naturais
 - John Locke
