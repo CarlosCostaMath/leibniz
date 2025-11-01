@@ -254,7 +254,8 @@ module Taxonomy
   end
 
   def front_matter_to_yaml(data)
-    yaml = Psych.dump(data, line_width: -1)
+    require 'yaml'
+    yaml = YAML.dump(data, indentation: 2, line_width: -1)
     yaml = yaml.sub(/\A---\s*\n/, "---\n")
     yaml << "---\n"
     yaml
