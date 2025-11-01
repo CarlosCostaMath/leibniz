@@ -26,9 +26,9 @@ extra_css:
     <ul class="taxonomy-nav">
       {%- for c in all_cats -%}
         {%- assign name = c[0] -%}
-        {%- assign slug = name | slugify -%}
+        {%- assign slug = name | slugify: 'latin' -%}
         <li>
-          <a class="button small outline" href="{{ '/category/' | relative_url }}?c={{ slug }}">
+          <a class="button small outline" href="{{ '/category/' | append: slug | append: '/' | relative_url }}">
             {{ name }} <span class="taxonomy-count">({{ c[1].size }})</span>
           </a>
         </li>

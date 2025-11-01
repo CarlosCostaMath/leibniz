@@ -1,0 +1,70 @@
+---
+layout: default
+---
+{%- assign type = page.taxonomy_type | default: 'tag' -%}
+{%- assign term = page.taxonomy_term | default: page.title -%}
+{%- assign is_tag = type == 'tag' -%}
+
+{%- assign posts = page.posts | default: empty -%}
+
+{%- if posts == empty -%}
+  {%- assign posts = site.posts -%}
+  {%- if is_tag -%}
+    {%- assign posts = posts | where_exp: 'post', "post.tags contains term" -%}
+  {%- else -%}
+    {%- assign posts = posts | where_exp: 'post', "post.categories contains term" -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if posts != empty -%}
+  {%- assign posts = posts | sort: 'date' | reverse -%}
+{%- endif -%}
+
+{%- assign post_count = posts | size -%}
+
+{%- if page.description -%}
+  {%- assign taxonomy_description = page.description -%}
+{%- elsif post_count > 0 -%}
+  {%- if post_count == 1 -%}
+    {%- assign count_text = 'publicação' -%}
+    {%- assign tag_verb = 'marcada' -%}
+  {%- else -%}
+    {%- assign count_text = 'publicações' -%}
+    {%- assign tag_verb = 'marcadas' -%}
+  {%- endif -%}
+  {%- if is_tag -%}
+    {%- assign taxonomy_description = post_count | append: ' ' | append: count_text | append: ' ' | append: tag_verb | append: ' com #' | append: term | append: '.' -%}
+  {%- else -%}
+    {%- assign taxonomy_description = post_count | append: ' ' | append: count_text | append: ' na categoria ' | append: term | append: '.' -%}
+  {%- endif -%}
+{%- endif -%}
+
+{% include breadcrumb.html %}
+
+<section class="post taxonomy-archive" id="taxonomy-{{ type }}">
+  <header class="major" style="display:block;">
+    <h1>{% if is_tag %}#{{ term }}{% else %}{{ term }}{% endif %}</h1>
+    {% if taxonomy_description %}
+    <p class="dek">{{ taxonomy_description }}</p>
+    {% endif %}
+  </header>
+
+  {% if posts and posts != empty %}
+  <ul class="archive-list taxonomy-list">
+    {% for post in posts %}
+    {% assign thumb = post.cover | default: post.hero_image | default: '/images/pic02.jpg' %}
+    <li class="archive-item">
+      <a class="archive-link" href="{{ post.url | relative_url }}">
+        <img class="thumb" src="{{ thumb | relative_url }}" alt="{{ post.title | default: 'Post' }}">
+        <div class="meta">
+          <h2 class="archive-title">{{ post.title | default: '(Sem título)' }}</h2>
+          <time class="archive-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p class="taxonomy-empty">Ainda não existem publicações associadas {% if is_tag %}a esta tag{% else %}a esta categoria{% endif %}.</p>
+  {% endif %}
+</section>

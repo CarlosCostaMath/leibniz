@@ -27,9 +27,9 @@ extra_css:
     <ul class="taxonomy-nav">
       {%- for t in all_tags -%}
         {%- assign name = t[0] -%}
-        {%- assign slug = name | slugify -%}
+        {%- assign slug = name | slugify: 'latin' -%}
         <li>
-          <a class="button small outline" href="{{ '/tag/' | relative_url }}?t={{ slug }}">
+          <a class="button small outline" href="{{ '/tag/' | append: slug | append: '/' | relative_url }}">
             #{{ name }}
           </a>
         </li>
