@@ -75,18 +75,12 @@ module Taxonomy
         'cover' => data['cover']
       }
 
-      Array(data['tags']).each do |tag|
-        label = tag.to_s.strip
-        next if label.empty?
-
-        acc[:tag][label] << payload.dup
+      taxonomy_terms(data, 'tags', 'tag').each do |tag|
+        acc[:tag][tag] << payload.dup
       end
 
-      Array(data['categories']).each do |category|
-        label = category.to_s.strip
-        next if label.empty?
-
-        acc[:category][label] << payload.dup
+      taxonomy_terms(data, 'categories', 'category').each do |category|
+        acc[:category][category] << payload.dup
       end
     end
   end
@@ -108,11 +102,8 @@ module Taxonomy
     return nil if slug.nil? || slug.empty?
 
     segments = []
-    Array(data['categories']).each do |category|
-      label = category.to_s.strip
-      next if label.empty?
-
-      segments << Slug.latin_slug(label)
+    taxonomy_terms(data, 'categories', 'category').each do |category|
+      segments << Slug.latin_slug(category)
     end
 
     if date
@@ -270,6 +261,28 @@ module Taxonomy
 
     payload.delete('cover') if payload['cover'] == payload['hero_image']
     payload
+  end
+
+  def taxonomy_terms(data, *keys)
+    keys.flat_map do |key|
+      normalise_terms(data[key])
+    end
+        .map { |term| term.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+  end
+
+  def normalise_terms(value)
+    case value
+    when nil
+      []
+    when Array
+      value.flat_map { |item| normalise_terms(item) }
+    when String
+      value.split(',').map(&:strip)
+    else
+      Array(value)
+    end
   end
 end
 
