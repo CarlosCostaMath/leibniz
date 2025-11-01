@@ -10,7 +10,7 @@ description: "Leibniz separa línguas naturais — históricas, imprecisas e hum
 author: Carlos Costa
 reading_time: "10 min de leitura"
 categories:
-- Filosofia da Linguagem
+- Fisolofia da Linguagem
 tags:
 - Leibniz
 - Filosofia da Linguagem
