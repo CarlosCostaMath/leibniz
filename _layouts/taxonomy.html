@@ -70,7 +70,7 @@ layout: default
     {% assign raw_date = post.date %}
     {% if raw_date %}
       {% assign iso_date = raw_date | date_to_xmlschema %}
-      {% assign display_date = raw_date | date: "%d de %B de %Y" %}
+      {% assign display_date = raw_date | date: "%B %d, %Y" %}
     {% endif %}
     <li class="archive-item">
       <a class="archive-link" href="{{ url }}">
