@@ -3,7 +3,11 @@ layout: default
 ---
 {%- assign type = page.taxonomy_type | default: 'tag' -%}
 {%- assign term = page.taxonomy_term | default: page.title -%}
-{%- assign is_tag = type == 'tag' -%}
+{%- if type == 'tag' -%}
+  {%- assign is_tag = true -%}
+{%- else -%}
+  {%- assign is_tag = false -%}
+{%- endif -%}
 
 {%- assign posts = page.posts -%}
 
@@ -53,9 +57,9 @@ layout: default
   {% if posts and posts != empty %}
   <ul class="archive-list taxonomy-list">
     {% for post in posts %}
-    {% assign title = post.title | default: post['title'] | default: '(Sem título)' %}
-    {% assign thumb = post.hero_image | default: post['hero_image'] | default: post.cover | default: post['cover'] | default: '/images/pic02.jpg' %}
-    {% assign url = post.url | default: post['url'] %}
+    {% assign title = post.title | default: '(Sem título)' %}
+    {% assign thumb = post.hero_image | default: post.cover | default: '/images/pic02.jpg' %}
+    {% assign url = post.url %}
     {% assign thumb_url = thumb %}
     {% unless thumb contains '://' %}
       {% assign thumb_url = thumb | relative_url %}
@@ -63,7 +67,7 @@ layout: default
     {% unless url contains '://' %}
       {% assign url = url | relative_url %}
     {% endunless %}
-    {% assign raw_date = post.date | default: post['date'] %}
+    {% assign raw_date = post.date %}
     {% if raw_date %}
       {% assign iso_date = raw_date | date_to_xmlschema %}
       {% assign display_date = raw_date | date: "%d de %B de %Y" %}
