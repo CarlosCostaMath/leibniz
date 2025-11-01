@@ -11,16 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: ruby/setup-ruby@v1
-        with: { ruby-version: '3.2' }
+        with:
+          ruby-version: '3.2'
       - name: Run taxonomy generator
         run: ruby scripts/generate_taxonomy_pages.rb
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(taxonomy): update tag/category pages"
-          add_options: "-A"          # <- inclui deleções e renomes no commit
-          file_pattern: |
-            tag/**
-            category/**
+          add_options: "-A"
