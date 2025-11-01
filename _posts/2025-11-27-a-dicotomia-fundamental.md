@@ -14,6 +14,7 @@ categories:
 tags:
 - Leibniz
 - Filosofia da Linguagem
+tags:
 - Línguas Artificiais
 - Línguas Naturais
 - John Locke
