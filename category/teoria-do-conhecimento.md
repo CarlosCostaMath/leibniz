@@ -1,11 +1,11 @@
 ---
 layout: "taxonomy"
-title: "#História"
-taxonomy_type: "tag"
-taxonomy_term: "História"
-taxonomy_slug: "historia"
-permalink: "/tag/historia/"
-description: "1 publicação marcada com #História."
+title: "Teoria do Conhecimento"
+taxonomy_type: "category"
+taxonomy_term: "Teoria do Conhecimento"
+taxonomy_slug: "teoria-do-conhecimento"
+permalink: "/category/teoria-do-conhecimento/"
+description: "1 publicação na categoria Teoria do Conhecimento."
 extra_css:
   - "/assets/css/taxonomy.css"
 posts:
