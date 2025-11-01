@@ -15,7 +15,6 @@ tags:
 - Leibniz
 - Lógica
 - História
-- Teste
 ---
 
 ## O Filósofo dos Múltiplos Mundos e de Uma Só Lógica
