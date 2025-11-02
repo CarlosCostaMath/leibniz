@@ -242,7 +242,7 @@ module Taxonomy
                     "#{count} #{count_text} na categoria #{preferred_label}."
                   end
 
-    {
+   {
       'layout' => LAYOUT_NAME,
       'title' => type == :tag ? "##{preferred_label}" : preferred_label,
       'taxonomy_type' => type.to_s,
@@ -250,8 +250,7 @@ module Taxonomy
       'taxonomy_slug' => slug,
       'permalink' => "/#{type}/#{slug}/",
       'description' => description,
-      'extra_css' => EXTRA_CSS,
-      'posts' => documents  # ← ADICIONE ESTA LINHA
+      'extra_css' => EXTRA_CSS
     }
   end
 
