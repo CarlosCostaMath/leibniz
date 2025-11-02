@@ -54,7 +54,7 @@ extra_css:
               {%- assign thumb = post.cover | default: post.hero_image | default: '/images/pic02.jpg' -%}
               <li class="archive-item">
                 <a class="archive-link" href="{{ post.url | relative_url }}">
-                  <img class="thumb" src="{{ thumb | relative_url }}" alt="{{ post.title | default: 'Post' }}">
+                  <img class="thumb" src="{{ thumb | relative_url }}" alt="{{ post.title | default: 'Post' | escape}}">
                   <div class="meta">
                     <h3 class="archive-title">{{ post.title | default: "(Sem título)" }}</h3>
                     <time class="archive-date" datetime="{{ post.date | date_to_xmlschema }}">
