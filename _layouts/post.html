@@ -60,7 +60,7 @@ layout: default
       <img src="{{ hero | relative_url }}" alt="{{ page.title }}" loading="eager">
       {% if page.hero_caption %}
         <div class="post-hero-caption">
-          {{ page.hero_caption | safe }}
+          {{ page.hero_caption | markdownify }}
         </div>
       {% endif %}
     </div>
