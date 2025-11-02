@@ -41,7 +41,7 @@ wrap_inner: false
   </header>
 
   <a href="{{ head.url | relative_url }}" class="image main">
-    <img src="{{ head.cover | default: head.hero_image | default: 'images/pic01.jpg' | relative_url }}" alt="{{ head.title }}" />
+    <img src="{{ head.cover | default: head.hero_image | default: 'images/pic01.jpg' | relative_url }}" alt="{{ head.title | escape }}" />
   </a>
 
   <ul class="actions special">
@@ -65,7 +65,7 @@ wrap_inner: false
       </header>
 
       <a href="{{ post.url | relative_url }}" class="image fit">
-        <img src="{{ post.cover | default: post.hero_image | default: 'images/pic02.jpg' | relative_url }}" alt="{{ post.title | default: '' }}" />
+        <img src="{{ post.cover | default: post.hero_image | default: 'images/pic02.jpg' | relative_url }}" alt="{{ post.title | default: '' | escape }}" />
       </a>
 
       <p>

@@ -69,7 +69,7 @@ Veja _posts/2025-10-23-guia-recursos-posts.md para exemplos de uso
   {% assign image_animation = 'zoom-in' %}
 {% endif %}
 <figure class="post-image {{ position }}" data-animate="{{ image_animation }}"{% if delay %} data-animate-delay="{{ delay }}"{% endif %}>
-    <img src="{{ include.src | relative_url }}" alt="{{ include.alt | default: '' }}" {% if position != 'center' %}loading="lazy"{% else %}loading="eager"{% endif %}>
+    <img src="{{ include.src | relative_url }}" alt="{{ include.alt | default: '' | escape }}" {% if position != 'center' %}loading="lazy"{% else %}loading="eager"{% endif %}>
     {% if include.caption %}<figcaption>{{ include.caption }}</figcaption>{% endif %}
 </figure>
 {% endif %}

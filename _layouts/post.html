@@ -57,7 +57,7 @@ layout: default
     {% assign hero = page.hero_image | default: page.cover %}
     {% if hero %}
     <div class="post-hero-image" data-animate="reveal">
-      <img src="{{ hero | relative_url }}" alt="{{ page.title }}" loading="eager">
+      <img src="{{ hero | relative_url }}" alt="{{ page.title | escape }}" loading="eager">
       {% if page.hero_caption %}
         <div class="post-hero-caption">
           {{ page.hero_caption | markdownify }}

@@ -19,7 +19,7 @@
   </header>
 
   <a href="{{ p.url | relative_url }}" class="image main">
-    <img src="{{ p.cover | default: p.hero_image | default: 'images/pic01.jpg' | relative_url }}" alt="{{ p.title }}" />
+    <img src="{{ p.cover | default: p.hero_image | default: 'images/pic01.jpg' | relative_url }}" alt="{{ p.title | escape }}" />
   </a>
 
   <ul class="actions special">
