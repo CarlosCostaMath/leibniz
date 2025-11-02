@@ -17,6 +17,7 @@ collections:
 excerpt_separator: "<!--more-->"
 plugins:
   - jekyll-paginate
+  - jekyll-redirect-from
 
 paginate: 7
 paginate_path: "/page/:num/"
