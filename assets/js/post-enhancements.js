@@ -2,6 +2,24 @@
   document.addEventListener('DOMContentLoaded', function () {
     const root = document.documentElement;
 
+    // Funções seguras para localStorage
+    const safeLocalStorage = {
+      getItem(key, fallback = null) {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          return fallback;
+        }
+      },
+      setItem(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch (e) {
+          // Silently ignore — don't break the site
+        }
+      }
+    };
+
     const fontIncrease = document.getElementById('fontIncrease');
     const fontDecrease = document.getElementById('fontDecrease');
     const mobileFontIncrease = document.getElementById('mobileFontIncrease');
@@ -9,7 +27,7 @@
     const fontControls = [fontIncrease, fontDecrease, mobileFontIncrease, mobileFontDecrease].filter(Boolean);
 
     if (fontControls.length > 0) {
-      let fontSize = parseInt(localStorage.getItem('fontSize'), 10);
+      let fontSize = parseInt(safeLocalStorage.getItem('fontSize'), 10);
       if (Number.isNaN(fontSize) || fontSize <= 0) {
         fontSize = 100;
       }
@@ -19,7 +37,7 @@
         if (fontSize < 130) {
           fontSize += 10;
           root.style.fontSize = fontSize + '%';
-          localStorage.setItem('fontSize', fontSize);
+          safeLocalStorage.setItem('fontSize', fontSize);
         }
       };
 
@@ -27,7 +45,7 @@
         if (fontSize > 80) {
           fontSize -= 10;
           root.style.fontSize = fontSize + '%';
-          localStorage.setItem('fontSize', fontSize);
+          safeLocalStorage.setItem('fontSize', fontSize);
         }
       };
 
@@ -36,6 +54,9 @@
       fontDecrease?.addEventListener('click', decrease);
       mobileFontDecrease?.addEventListener('click', decrease);
     }
+
+    // O restante do seu script permanece exatamente igual...
+    // (não há mais uso de localStorage abaixo desta seção)
 
     const navBar = document.querySelector('.post-nav-bar');
     if (navBar) {
