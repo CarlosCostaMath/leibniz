@@ -3,21 +3,42 @@ layout: default
 ---
 {%- assign type = page.taxonomy_type | default: 'tag' -%}
 {%- assign term = page.taxonomy_term | default: page.title -%}
+{%- assign slug_source = page.taxonomy_slug | default: term -%}
+{%- assign target_slug = slug_source | slugify: 'latin' -%}
 {%- if type == 'tag' -%}
   {%- assign is_tag = true -%}
 {%- else -%}
   {%- assign is_tag = false -%}
 {%- endif -%}
 
-{%- assign posts = site.posts -%}
-{%- if is_tag -%}
-  {%- assign posts = posts | where_exp: 'post', "post.tags contains term" -%}
-{%- else -%}
-  {%- assign posts = posts | where_exp: 'post', "post.categories contains term" -%}
-{%- endif -%}
-{%- assign posts = posts | sort: 'date' | reverse -%}
+{%- assign posts = site.posts | sort: 'date' | reverse -%}
+{%- assign filtered_posts = '' | split: '' -%}
 
-{%- assign post_count = posts | size -%}
+{%- for post in posts -%}
+  {%- if is_tag -%}
+    {%- assign taxonomy_terms = post.tags -%}
+  {%- else -%}
+    {%- assign taxonomy_terms = post.categories -%}
+  {%- endif -%}
+
+  {%- if taxonomy_terms and taxonomy_terms != empty -%}
+    {%- assign taxonomy_terms = taxonomy_terms | arrayify -%}
+    {%- assign matched = false -%}
+    {%- for label in taxonomy_terms -%}
+      {%- assign label_slug = label | slugify: 'latin' -%}
+      {%- if label_slug == target_slug -%}
+        {%- assign matched = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if matched -%}
+      {%- assign filtered_posts = filtered_posts | push: post -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign post_count = filtered_posts | size -%}
 
 {%- if page.description -%}
   {%- assign taxonomy_description = page.description -%}
@@ -46,9 +67,9 @@ layout: default
     {% endif %}
   </header>
 
-  {% if posts and posts != empty %}
+  {% if filtered_posts and filtered_posts != empty %}
   <ul class="archive-list taxonomy-list">
-    {% for post in posts %}
+    {% for post in filtered_posts %}
     {% assign title = post.title | default: '(Sem título)' %}
     {% assign thumb = post.hero_image | default: post.cover | default: '/images/pic02.jpg' %}
     {% assign url = post.url %}
