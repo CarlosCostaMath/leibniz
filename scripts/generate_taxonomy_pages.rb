@@ -61,8 +61,8 @@ module Taxonomy
     errors = []
 
     groups = {
-      tag: Hash.new { |h, k| h[k] = [] },
-      category: Hash.new { |h, k| h[k] = [] }
+      tag: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } },
+      category: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } }
     }
 
     result = posts.each_with_object(groups) do |path, acc|
@@ -84,11 +84,19 @@ module Taxonomy
         }
 
         taxonomy_terms(data, 'tags', 'tag').each do |tag|
-          acc[:tag][tag] << payload.dup
+          slug = Slug.latin_slug(tag)
+          entry = acc[:tag][slug]
+          entry[:preferred_label] ||= tag
+          entry[:labels] << tag
+          entry[:documents] << payload.dup
         end
 
         taxonomy_terms(data, 'categories', 'category').each do |category|
-          acc[:category][category] << payload.dup
+          slug = Slug.latin_slug(category)
+          entry = acc[:category][slug]
+          entry[:preferred_label] ||= category
+          entry[:labels] << category
+          entry[:documents] << payload.dup
         end
       rescue StandardError => e
         errors << { path: path, error: e, context: :collect }
@@ -198,17 +206,18 @@ module Taxonomy
 
   def write_taxonomy(type, entries, errors)
     base_dir = TAXONOMY_DIRS.fetch(type)
-    keep_paths = Set.new
+    keep_slugs = Set.new
 
-    entries.sort_by { |term, _| Slug.latin_slug(term) }.each do |term, documents|
+    entries.sort_by { |slug, entry| [Slug.latin_slug(entry[:preferred_label] || slug), slug] }.each do |slug, entry|
+      documents = entry[:documents]
       next if documents.empty?
 
       begin
-        slug = Slug.latin_slug(term)
+        preferred_label = entry[:preferred_label] || slug
         page_path = File.join(base_dir, "#{slug}.md")
-        keep_paths << page_path
+        keep_slugs << slug
 
-        front_matter = build_front_matter(type, term, slug, documents.size)
+        front_matter = build_front_matter(type, slug, preferred_label, documents.size)
         content = front_matter_to_yaml(front_matter)
 
         if !File.exist?(page_path) || read_generated_page(page_path) != content
@@ -216,28 +225,28 @@ module Taxonomy
           puts "[#{type}] wrote #{page_path.sub(ROOT + '/', '')}"
         end
       rescue StandardError => e
-        errors << { path: page_path || File.join(base_dir, Slug.latin_slug(term) || 'erro'), error: e, context: "#{type}:#{term}" }
+        errors << { path: page_path || File.join(base_dir, slug || 'erro'), error: e, context: "#{type}:#{preferred_label}" }
       end
     end
 
-    remove_stale_entries(base_dir, keep_paths, errors)
+    remove_stale_entries(base_dir, keep_slugs, errors)
   end
 
-  def build_front_matter(type, term, slug, count)
+  def build_front_matter(type, slug, preferred_label, count)
     count_text = count == 1 ? 'publicação' : 'publicações'
 
     description = if type == :tag
                     verb = count == 1 ? 'marcada' : 'marcadas'
-                    "#{count} #{count_text} #{verb} com ##{term}."
+                    "#{count} #{count_text} #{verb} com ##{preferred_label}."
                   else
-                    "#{count} #{count_text} na categoria #{term}."
+                    "#{count} #{count_text} na categoria #{preferred_label}."
                   end
 
     {
       'layout' => LAYOUT_NAME,
-      'title' => type == :tag ? "##{term}" : term,
+      'title' => type == :tag ? "##{preferred_label}" : preferred_label,
       'taxonomy_type' => type.to_s,
-      'taxonomy_term' => term,
+      'taxonomy_term' => preferred_label,
       'taxonomy_slug' => slug,
       'permalink' => "/#{type}/#{slug}/",
       'description' => description,
@@ -258,10 +267,11 @@ module Taxonomy
     File.open(path, 'r:bom|utf-8') { |file| file.read }
   end
 
-  def remove_stale_entries(base_dir, keep_paths, errors)
+  def remove_stale_entries(base_dir, keep_slugs, errors)
     # Remove arquivos .md que não estão mais em uso
     existing_md_files = Dir.glob(File.join(base_dir, '*.md'))
-    stale_md_files = existing_md_files - keep_paths.to_a
+    keep_files = keep_slugs.map { |slug| File.join(base_dir, "#{slug}.md") }
+    stale_md_files = existing_md_files - keep_files
 
     stale_md_files.each do |file|
       begin
