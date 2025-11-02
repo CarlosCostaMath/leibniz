@@ -251,6 +251,7 @@ module Taxonomy
       'permalink' => "/#{type}/#{slug}/",
       'description' => description,
       'extra_css' => EXTRA_CSS
+      'posts' => documents
     }
   end
 
