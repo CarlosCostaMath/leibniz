@@ -6,6 +6,7 @@ require 'fileutils'
 require 'set'
 require 'time'
 require 'date'
+require 'jekyll'  # ← ADICIONADO: necessário para Jekyll::Utils.slugify
 
 ROOT = File.expand_path('..', __dir__)
 POSTS_DIR = File.join(ROOT, '_posts')
@@ -30,26 +31,11 @@ end
 module Slug
   module_function
 
-  TRANSLITERATIONS = {
-    'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
-    'Á' => 'a', 'À' => 'a', 'Ã' => 'a', 'Â' => 'a', 'Ä' => 'a',
-    'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
-    'É' => 'e', 'È' => 'e', 'Ê' => 'e', 'Ë' => 'e',
-    'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-    'Í' => 'i', 'Ì' => 'i', 'Î' => 'i', 'Ï' => 'i',
-    'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o',
-    'Ó' => 'o', 'Ò' => 'o', 'Ô' => 'o', 'Õ' => 'o', 'Ö' => 'o',
-    'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-    'Ú' => 'u', 'Ù' => 'u', 'Û' => 'u', 'Ü' => 'u',
-    'ñ' => 'n', 'Ñ' => 'n',
-    'ç' => 'c', 'Ç' => 'c'
-  }.freeze
-
   def latin_slug(term)
-    transliterated = term.to_s.each_char.map { |char| TRANSLITERATIONS.fetch(char, char) }.join
-    slug = transliterated.downcase.gsub(/[^a-z0-9\s-]/, ' ')
-    slug = slug.strip.gsub(/\s+/, '-').gsub(/-+/, '-')
-    slug.empty? ? 'untitled' : slug
+    # Usa o slugify oficial do Jekyll com modo 'latin'
+    slug = Jekyll::Utils.slugify(term.to_s, mode: 'latin', cased: false)
+    # Substitui underscores por hífens (opcional, mas consistente)
+    slug.tr('_', '-').empty? ? 'untitled' : slug
   end
 end
 
@@ -243,7 +229,7 @@ module Taxonomy
                     "#{count} #{count_text} na categoria #{preferred_label}."
                   end
 
-   {
+    {
       'layout' => LAYOUT_NAME,
       'title' => type == :tag ? "##{preferred_label}" : preferred_label,
       'taxonomy_type' => type.to_s,
