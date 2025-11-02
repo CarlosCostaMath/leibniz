@@ -50,6 +50,13 @@ category/, tag/    → Diretórios de categorias e tags; cada termo possui `inde
 - Cada arquivo gerado inclui, no front matter, a lista de posts associados (título, permalink, data e miniatura) para que as páginas sigam preenchidas mesmo em builds que não publiquem posts futuros.
 - Se preferir automatizar, adicione o comando ao fluxo de CI ou a um hook local (`bin/post-commit`, por exemplo) para evitar que novas taxonomias sejam esquecidas.
 
+## Publicação com GitHub Actions
+
+- Os deploys são publicados automaticamente a partir da branch `main` via workflow [`Build and deploy site`](.github/workflows/deploy.yml).
+- O workflow executa `bundle install`, roda `ruby scripts/generate_taxonomy_pages.rb` e, em seguida, `bundle exec jekyll build --trace` usando Ruby 3.2.
+- A pasta `_site/` resultante é enviada ao GitHub Pages com `actions/upload-pages-artifact` + `actions/deploy-pages`, garantindo que a versão gerada com Jekyll 4.x seja publicada.
+- Não são necessários segredos adicionais: o workflow usa o `GITHUB_TOKEN` padrão para publicar no Pages. Caso precise disparar o deploy manualmente, utilize a ação **Run workflow** no GitHub.
+
 ## Estilos, scripts e componentes
 
 - `assets/css/main.css` e `assets/css/custom.css` centralizam o estilo global. Novas regras específicas podem ser adicionadas em arquivos dedicados e incluídas via `extra_css` no front matter.
