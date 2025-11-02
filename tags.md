@@ -10,6 +10,7 @@ extra_css:
 {% include breadcrumb.html %}
 
 <section class="page-section taxonomy-page" id="tags-page">
+  <!-- Seção: Cabeçalho de tags -->
   <div class="inner">
     <header class="major taxonomy-header">
       <h1>{{ page.title }}</h1>
@@ -19,16 +20,17 @@ extra_css:
     </header>
   </div>
 
-  {%- assign tag_pages = site.pages | where: "taxonomy_type", "tag" -%}
-  {%- assign sorted = tag_pages | sort: "taxonomy_slug" -%}
+  {%- assign all_tags = site.tags | sort -%}
 
-  {%- if sorted and sorted.size > 0 -%}
+  <!-- Seção: Lista de tags -->
+  {%- if all_tags and all_tags.size > 0 -%}
     <ul class="taxonomy-nav">
-      {%- for p in sorted -%}
+      {%- for t in all_tags -%}
+        {%- assign name = t[0] -%}
+        {%- assign slug = name | slugify: 'latin' -%}
         <li>
-          <a class="button small outline" href="{{ p.url | relative_url }}">
-            #{{ p.taxonomy_term }}
-            <span class="taxonomy-count">({{ p.posts | size }})</span>
+          <a class="button small outline" href="{{ '/tag/' | append: slug | append: '/' | relative_url }}">
+            #{{ name }}
           </a>
         </li>
       {%- endfor -%}
