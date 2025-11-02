@@ -250,7 +250,8 @@ module Taxonomy
       'taxonomy_slug' => slug,
       'permalink' => "/#{type}/#{slug}/",
       'description' => description,
-      'extra_css' => EXTRA_CSS
+      'extra_css' => EXTRA_CSS,
+      'posts' => documents  # ← ADICIONE ESTA LINHA
     }
   end
 
