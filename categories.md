@@ -21,49 +21,65 @@ extra_css:
     </header>
   </div>
 
-  {%- comment -%}
-    TENTATIVA 1 — usar o índice nativo do Jekyll:
-    'site.categories' é um hash: [ [nome, [posts...]], ... ]
-  {%- endcomment -%}
-  {%- assign all_cats = site.categories | sort -%}
+  {%- assign category_pages = site.pages | where: "taxonomy_type", "category" -%}
+  {%- assign category_entries = '' | split: '' -%}
 
-  {%- if all_cats and all_cats.size > 0 -%}
+  {%- for post in site.posts -%}
+    {%- assign seen_slugs = '' | split: '' -%}
+    {%- for term in post.categories -%}
+      {%- assign slug = term | slugify: 'latin' -%}
+      {%- unless seen_slugs contains slug -%}
+        {%- assign seen_slugs = seen_slugs | push: slug -%}
+        {%- capture entry_json -%}{"slug":"{{ slug }}","label":{{ term | jsonify }}}{%- endcapture -%}
+        {%- assign entry = entry_json | from_json -%}
+        {%- assign category_entries = category_entries | push: entry -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endfor -%}
+
+  {%- assign grouped_categories = category_entries | group_by: "slug" -%}
+
+  {%- capture category_map_json -%}
+  {
+  {%- for group in grouped_categories -%}
+    {%- assign slug = group.name -%}
+    {%- assign matching_pages = category_pages | where: "taxonomy_slug", slug -%}
+    {%- assign preferred_page = matching_pages | first -%}
+    {%- if preferred_page -%}
+      {%- assign preferred_label = preferred_page.taxonomy_term | default: preferred_page.title -%}
+    {%- else -%}
+      {%- assign labels = group.items | map: "label" | uniq -%}
+      {%- assign preferred_label = labels | sort_natural | first -%}
+    {%- endif -%}
+    {%- assign count = group.items | size -%}
+    "{{ slug }}": {
+      "slug": "{{ slug }}",
+      "label": {{ preferred_label | jsonify }},
+      "count": {{ count }}
+    }{%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%}
+  }
+  {%- endcapture -%}
+
+  {%- assign category_map = category_map_json | from_json -%}
+  {%- assign category_list = '' | split: '' -%}
+  {%- for pair in category_map -%}
+    {%- assign data = pair[1] -%}
+    {%- assign category_list = category_list | push: data -%}
+  {%- endfor -%}
+  {%- assign sorted_categories = category_list | sort_natural: "label" -%}
+
+  {%- if sorted_categories and sorted_categories.size > 0 -%}
     <ul class="taxonomy-nav">
-      {%- for c in all_cats -%}
-        {%- assign name = c[0] -%}
-        {%- assign posts = c[1] -%}
-        {%- assign slug = name | slugify: 'latin' -%}
+      {%- for category in sorted_categories -%}
         <li>
-          <a class="button small outline" href="{{ '/category/' | append: slug | append: '/' | relative_url }}">
-            {{ name }} <span class="taxonomy-count">({{ posts | size }})</span>
+          <a class="button small outline" href="{{ '/category/' | append: category.slug | append: '/' | relative_url }}">
+            {{ category.label }} <span class="taxonomy-count">({{ category.count }})</span>
           </a>
         </li>
       {%- endfor -%}
     </ul>
-
   {%- else -%}
-    {%- comment -%}
-      TENTATIVA 2 — fallback para páginas geradas pelo script (Codex):
-      varremos site.pages com taxonomy_type: "category".
-    {%- endcomment -%}
-    {%- assign cat_pages = site.pages | where: "taxonomy_type", "category" -%}
-    {%- assign sorted = cat_pages | sort: "taxonomy_slug" -%}
-
-    {%- if sorted and sorted.size > 0 -%}
-      <ul class="taxonomy-nav">
-        {%- for p in sorted -%}
-          <li>
-            <a class="button small outline" href="{{ p.url | relative_url }}">
-              {{ p.title }}
-              {%- if p.posts -%}
-                <span class="taxonomy-count">({{ p.posts | size }})</span>
-              {%- endif -%}
-            </a>
-          </li>
-        {%- endfor -%}
-      </ul>
-    {%- else -%}
-      <p>Ainda não há categorias cadastradas.</p>
-    {%- endif -%}
+    <p>Ainda não há categorias cadastradas.</p>
   {%- endif -%}
 </section>
