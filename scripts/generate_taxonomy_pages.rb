@@ -233,6 +233,7 @@ module Taxonomy
   end
 
   def build_front_matter(type, slug, preferred_label, documents)
+    count = documents.length
     count_text = count == 1 ? 'publicação' : 'publicações'
 
     description = if type == :tag
