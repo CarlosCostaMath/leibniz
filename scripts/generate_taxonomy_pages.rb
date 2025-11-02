@@ -217,7 +217,7 @@ module Taxonomy
         page_path = File.join(base_dir, "#{slug}.md")
         keep_slugs << slug
 
-        front_matter = build_front_matter(type, slug, preferred_label, documents.size)
+        front_matter = build_front_matter(type, slug, preferred_label, documents)
         content = front_matter_to_yaml(front_matter)
 
         if !File.exist?(page_path) || read_generated_page(page_path) != content
@@ -232,7 +232,7 @@ module Taxonomy
     remove_stale_entries(base_dir, keep_slugs, errors)
   end
 
-  def build_front_matter(type, slug, preferred_label, count)
+  def build_front_matter(type, slug, preferred_label, documents)
     count_text = count == 1 ? 'publicação' : 'publicações'
 
     description = if type == :tag
