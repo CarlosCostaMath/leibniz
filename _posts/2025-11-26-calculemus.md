@@ -15,6 +15,7 @@ tags:
 - Lógica
 - História
 - Computação
+- Reparação
 ---
 
 ## O Filósofo dos Múltiplos Mundos e de Uma Só Lógica
