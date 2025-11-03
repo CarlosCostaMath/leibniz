@@ -7,35 +7,6 @@ description: Navegue pela nuvem de tags para encontrar artigos relacionados aos 
 extra_css:
   - /assets/css/taxonomy.css
 ---
+
 {% include breadcrumb.html %}
-
-<section class="page-section taxonomy-page" id="tags-page">
-  <!-- Seção: Cabeçalho de tags -->
-  <div class="inner">
-    <header class="major taxonomy-header">
-      <h1>{{ page.title }}</h1>
-      {%- if page.description -%}
-        <p class="dek">{{ page.description }}</p>
-      {%- endif -%}
-    </header>
-  </div>
-
-  {%- assign all_tags = site.tags | sort -%}
-
-  <!-- Seção: Lista de tags -->
-  {%- if all_tags and all_tags.size > 0 -%}
-    <ul class="taxonomy-nav">
-      {%- for t in all_tags -%}
-        {%- assign name = t[0] -%}
-        {%- assign slug = name | slugify: 'latin' -%}
-        <li>
-          <a class="button small outline" href="{{ '/tag/' | append: slug | append: '/' | relative_url }}">
-            #{{ name }}
-          </a>
-        </li>
-      {%- endfor -%}
-    </ul>
-  {%- else -%}
-    <p>Ainda não há tags cadastradas.</p>
-  {%- endif -%}
-</section>
+{% include list-categories-and-tags.html type="tags" %} <!-- Atualizado -->
