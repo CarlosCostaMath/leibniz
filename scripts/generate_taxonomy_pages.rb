@@ -47,9 +47,10 @@ module Taxonomy
     posts = Dir.glob(File.join(POSTS_DIR, '**', '*.{md,markdown}'), File::FNM_CASEFOLD)
     errors = []
 
+    # groups armazena o termo original como chave, e um hash com 'slug' e 'data' como valor
     groups = {
-      tag: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } },
-      category: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } }
+      tag: Hash.new { |h, k| h[k] = { slug: nil, data: { preferred_label: nil, labels: Set.new, documents: [] } } },
+      category: Hash.new { |h, k| h[k] = { slug: nil, data: { preferred_label: nil, labels: Set.new, documents: [] } } }
     }
 
     result = posts.each_with_object(groups) do |path, acc|
@@ -70,27 +71,44 @@ module Taxonomy
           'cover' => data['cover']
         }
 
-        taxonomy_terms(data, 'tags', 'tag').each do |tag|
-          slug = Slug.latin_slug(tag)
-          entry = acc[:tag][slug]
-          entry[:preferred_label] ||= tag
-          entry[:labels] << tag
-          entry[:documents] << payload.dup
+        # Processa tags
+        taxonomy_terms(data, 'tags', 'tag').each do |raw_term|
+          # Calcula slug apenas uma vez por termo, armazenando junto ao termo original
+          slug = Slug.latin_slug(raw_term)
+          entry = acc[:tag][raw_term] # Usa o termo original como chave
+          entry[:slug] = slug # Armazena o slug calculado
+          entry[:data][:preferred_label] ||= raw_term
+          entry[:data][:labels] << raw_term
+          entry[:data][:documents] << payload.dup
         end
 
-        taxonomy_terms(data, 'categories', 'category').each do |category|
-          slug = Slug.latin_slug(category)
-          entry = acc[:category][slug]
-          entry[:preferred_label] ||= category
-          entry[:labels] << category
-          entry[:documents] << payload.dup
+        # Processa categorias
+        taxonomy_terms(data, 'categories', 'category').each do |raw_term|
+          # Calcula slug apenas uma vez por termo, armazenando junto ao termo original
+          slug = Slug.latin_slug(raw_term)
+          entry = acc[:category][raw_term] # Usa o termo original como chave
+          entry[:slug] = slug # Armazena o slug calculado
+          entry[:data][:preferred_label] ||= raw_term
+          entry[:data][:labels] << raw_term
+          entry[:data][:documents] << payload.dup
         end
       rescue StandardError => e
         errors << { path: path, error: e, context: :collect }
       end
     end
 
-    [result, errors]
+    # Retorna os dados agrupados por tipo, mas com slug já calculado e armazenado
+    # Precisamos mapear para que a próxima etapa espere { slug => data } como antes
+    processed_result = {}
+    result.each do |type, entries_by_term|
+      processed_result[type] = {}
+      entries_by_term.each do |raw_term, stored_data|
+        slug = stored_data[:slug]
+        processed_result[type][slug] = stored_data[:data] # Agora { slug => { preferred_label, labels, documents } }
+      end
+    end
+
+    [processed_result, errors]
   end
 
   def read_post(path)
@@ -119,7 +137,7 @@ module Taxonomy
 
     segments = []
     taxonomy_terms(data, 'categories', 'category').each do |category|
-      segments << Slug.latin_slug(category)
+      segments << Slug.latin_slug(category) # Aqui ainda pode haver recálculo, mas é uma vez por post
     end
 
     if date
@@ -195,6 +213,7 @@ module Taxonomy
     base_dir = TAXONOMY_DIRS.fetch(type)
     keep_slugs = Set.new
 
+    # Ordena usando o slug armazenado, evitando recálculo
     entries.sort_by { |slug, entry| [Slug.latin_slug(entry[:preferred_label] || slug), slug] }.each do |slug, entry|
       documents = entry[:documents]
       next if documents.empty?
