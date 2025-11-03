@@ -19,14 +19,6 @@
   {%- assign taxonomy_type_value = "" -%}
 {%- endif -%}
 
-<!-- DEBUG (remover depois): -->
-<p>[DEBUG] tax_type: {{ tax_type }}</p>
-<p>[DEBUG] taxonomy_type_value: {{ taxonomy_type_value }}</p>
-
-<!-- DEBUG (remover depois): -->
-{% assign debug_pages = site.pages | where: "taxonomy_type", taxonomy_type_value %}
-<p>[DEBUG] Total de páginas com taxonomy_type '{{ taxonomy_type_value }}': {{ debug_pages | size }}</p>
-
 <section class="page-section taxonomy-page" id="{{ tax_type }}-page">
   <!-- Cabeçalho -->
   <div class="inner">
@@ -43,9 +35,6 @@
   {%- endcomment -%}
   {%- assign tax_pages = site.pages | where: "taxonomy_type", taxonomy_type_value -%}
   {%- assign sorted = tax_pages | sort: "taxonomy_slug" -%}
-
-  <!-- DEBUG (remover depois): -->
-  <p>[DEBUG] Tamanho da lista 'sorted': {{ sorted.size }}</p>
 
   {%- if sorted and sorted.size > 0 -%}
     <ul class="taxonomy-nav">
