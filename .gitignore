@@ -1,0 +1,32 @@
+# Build output do Jekyll
+/_site/
+
+# Caches do Jekyll
+/.sass-cache/
+/.jekyll-cache/
+.jekyll-metadata
+
+# Artefatos do Ruby/Bundler
+/.bundle/
+/vendor/bundle/
+coverage/
+pkg/
+tmp/
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Arquivos de IDE/editor (opcionais, mas recomendados)
+/.vscode/
+/.idea/
+
+# Arquivos específicos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente (nunca devem ser commitadas)
+.env
+.env.local
