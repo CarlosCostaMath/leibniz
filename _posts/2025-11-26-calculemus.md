@@ -10,7 +10,7 @@ description: "Descubra como um filósofo do século XVII antecipou através de u
 author: Carlos Costa
 reading_time: "12 min de leitura"
 categories:
-- Teoria do Conhecimento
+- Filosofia
 tags:
 - Lógica
 - História
