@@ -51,7 +51,7 @@ jobs:
         with:
           commit_message: "chore(taxonomy): sync generated pages"
           add_options: "-A"
-          commit_options: "--no-verify"
+          commit_options: "--allow-empty"
           push_options: "--force"
           file_pattern: |
             tag/
