@@ -53,9 +53,6 @@ jobs:
           add_options: "-A"
           commit_options: "--allow-empty"
           push_options: "--force"
-          file_pattern: |
-            tag/
-            category/
 
   deploy:
     runs-on: ubuntu-latest
