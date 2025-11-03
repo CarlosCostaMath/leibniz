@@ -12,6 +12,14 @@
 {%- comment -%} Mapeia o tipo para o valor usado no front_matter pelo script {%- endcomment -%}
 {%- assign taxonomy_type_value = tax_type | replace: "ies", "y" | replace: "es", "" -%} <!-- categories -> category, tags -> tag -->
 
+<!-- DEBUG: Mostra os valores usados -->
+<p>[DEBUG] tax_type: {{ tax_type }}</p>
+<p>[DEBUG] taxonomy_type_value: {{ taxonomy_type_value }}</p>
+
+<!-- DEBUG: Conta páginas encontradas -->
+{% assign debug_pages = site.pages | where: "taxonomy_type", taxonomy_type_value %}
+<p>[DEBUG] Total de páginas com taxonomy_type '{{ taxonomy_type_value }}': {{ debug_pages | size }}</p>
+
 <section class="page-section taxonomy-page" id="{{ tax_type }}-page">
   <!-- Cabeçalho -->
   <div class="inner">
@@ -28,6 +36,9 @@
   {%- endcomment -%}
   {%- assign tax_pages = site.pages | where: "taxonomy_type", taxonomy_type_value -%}
   {%- assign sorted = tax_pages | sort: "taxonomy_slug" -%}
+
+  <!-- DEBUG: Mostra o tamanho da lista final -->
+  <p>[DEBUG] Tamanho da lista 'sorted': {{ sorted.size }}</p>
 
   {%- if sorted and sorted.size > 0 -%}
     <ul class="taxonomy-nav">
