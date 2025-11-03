@@ -90,7 +90,7 @@ layout: default
       <span class="separator">•</span>
       <span><strong>Data:</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d de %B de %Y" }}</time></span>
       <!-- Início: Cálculo Automático do Tempo de Leitura -->
-      {% assign words_per_minute = 200 %} <!-- Taxa de leitura padrão -->
+      {% assign words_per_minute = 150 %} <!-- Taxa de leitura padrão -->
       {% assign words = content | number_of_words %}
       {% assign read_time = words | divided_by: words_per_minute | ceil %}
       <span class="separator">•</span>
