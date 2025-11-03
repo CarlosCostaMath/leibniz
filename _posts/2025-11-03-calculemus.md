@@ -2,7 +2,7 @@
 layout: post
 title: "Calculemus! Como Leibniz Sonhou com a Lógica Moderna Séculos Antes de Ela Existir"
 subtitle: ""
-date: 2025-11-26 12:00:00 -0300   # alinhei a data ao nome do arquivo
+date: 2025-11-03 12:00:00 -0300   # alinhei a data ao nome do arquivo
 featured: true
 hero_image: images/calculemus/calculemus-capa.jpeg
 hero_caption: "Leibniz. — <a href=\"https://web.ics.purdue.edu/~jacover/Leibniz.htm\" target=\"_blank\" rel=\"noopener\">Imagem: purdue.edu</a>"
