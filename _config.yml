@@ -1,7 +1,7 @@
 title: "Leibniz Blog"
 lang: pt-BR
 
-url: "https://carloscostamath.github.io  "
+url: "https://carloscostamath.github.io" # Espaço extra removido
 baseurl: "/leibniz"          # "" se for user site
 timezone: America/Maceio
 future: true
@@ -18,6 +18,10 @@ excerpt_separator: "<!--more-->"
 plugins:
   - jekyll-paginate
   - jekyll-redirect-from
+  # - jekyll-assets # Exemplo: plugin alternativo (requer instalação e configuração adicionais)
+
+sass:
+  style: compressed # Esta linha ativa a minificação do CSS gerado a partir de SASS
 
 paginate: 7
 paginate_path: "/page/:num/"
