@@ -9,5 +9,5 @@ gem "jekyll-redirect-from", "~> 0.16"
 
 # Plugins Jekyll
 group :jekyll_plugins do
-  gem "jekyll-readtime"
+  gem "jekyll-read-time"
 end
