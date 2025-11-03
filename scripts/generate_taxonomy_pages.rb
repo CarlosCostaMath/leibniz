@@ -6,6 +6,7 @@ require 'fileutils'
 require 'set'
 require 'time'
 require 'date'
+require 'bundler/setup'
 require 'jekyll'  # ← ADICIONADO: necessário para Jekyll::Utils.slugify
 
 ROOT = File.expand_path('..', __dir__)

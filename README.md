@@ -39,7 +39,7 @@ category/, tag/    → Diretórios de categorias e tags; cada termo possui `inde
      - Lógica
    ```
 2. Ajuste a grafia conforme necessário. Use sempre letras maiúsculas/minúsculas desejadas — o script gerará o slug (`História da Lógica` → `/category/historia-da-logica/`) automaticamente.
-3. Execute `ruby scripts/generate_taxonomy_pages.rb`. O script sincroniza os diretórios `category/` e `tag/`, criando novas páginas ou removendo as que ficarem sem posts.
+3. Execute `bundle exec ruby scripts/generate_taxonomy_pages.rb`. O script sincroniza os diretórios `category/` e `tag/`, criando novas páginas ou removendo as que ficarem sem posts.
 4. Por fim, rode `bundle exec jekyll build` ou `serve` para validar o resultado.
 
 ## Script de taxonomias
@@ -53,7 +53,7 @@ category/, tag/    → Diretórios de categorias e tags; cada termo possui `inde
 ## Publicação com GitHub Actions
 
 - Os deploys são publicados automaticamente a partir da branch `main` via workflow [`Build and deploy site`](.github/workflows/deploy.yml).
-- O workflow executa `bundle install`, roda `ruby scripts/generate_taxonomy_pages.rb` e, em seguida, `bundle exec jekyll build --trace` usando Ruby 3.2.
+- O workflow executa `bundle install`, roda `bundle exec ruby scripts/generate_taxonomy_pages.rb` e, em seguida, `bundle exec jekyll build --trace` usando Ruby 3.2.
 - A pasta `_site/` resultante é enviada ao GitHub Pages com `actions/upload-pages-artifact` + `actions/deploy-pages`, garantindo que a versão gerada com Jekyll 4.x seja publicada.
 - Não são necessários segredos adicionais: o workflow usa o `GITHUB_TOKEN` padrão para publicar no Pages. Caso precise disparar o deploy manualmente, utilize a ação **Run workflow** no GitHub.
 
