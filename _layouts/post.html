@@ -89,10 +89,13 @@ layout: default
       <span><strong>Por:</strong> {{ page.author | default: site.author | default: 'Carlos Costa' }}</span>
       <span class="separator">•</span>
       <span><strong>Data:</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d de %B de %Y" }}</time></span>
-      {% if page.reading_time %}
+      <!-- Início: Cálculo Automático do Tempo de Leitura -->
+      {% assign words_per_minute = 200 %} <!-- Taxa de leitura padrão -->
+      {% assign words = content | number_of_words %}
+      {% assign read_time = words | divided_by: words_per_minute | ceil %}
       <span class="separator">•</span>
-      <span><strong>Leitura:</strong> {{ page.reading_time }}</span>
-      {% endif %}
+      <span><strong>Leitura:</strong> {% if read_time == 1 %}1 minuto{% else %}{{ read_time }} minutos{% endif %}</span>
+      <!-- Fim: Cálculo Automático do Tempo de Leitura -->
     </div>
   </header>
 
