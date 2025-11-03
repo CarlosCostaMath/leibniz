@@ -1,0 +1,325 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+require 'fileutils'
+require 'set'
+require 'time'
+require 'date'
+require 'bundler/setup' unless ENV['SKIP_BUNDLER_SETUP'] == '1'
+require 'jekyll' unless ENV['SKIP_JEKYLL_REQUIRE'] == '1'  # ← ADICIONADO: necessário para Jekyll::Utils.slugify
+
+ROOT = File.expand_path('..', __dir__)
+POSTS_DIR = File.join(ROOT, '_posts')
+TAXONOMY_DIRS = {
+  tag: File.join(ROOT, 'tag'),
+  category: File.join(ROOT, 'category')
+}.freeze
+LAYOUT_NAME = 'taxonomy'
+EXTRA_CSS = ['/assets/css/taxonomy.css'].freeze
+
+class FrontMatter
+  FRONT_MATTER_REGEX = /\A---\s*\r?\n(.*?)\r?\n---\s*/m.freeze
+
+  def self.load(content)
+    match = content.match(FRONT_MATTER_REGEX)
+    return {} unless match
+
+    YAML.safe_load(match[1], permitted_classes: [Date, Time], aliases: true) || {}
+  end
+end
+
+module Slug
+  module_function
+
+  def latin_slug(term)
+    # Usa o slugify oficial do Jekyll com modo 'latin'
+    slug = Jekyll::Utils.slugify(term.to_s, mode: 'latin', cased: false)
+    # Substitui underscores por hífens (opcional, mas consistente)
+    slug.tr('_', '-').empty? ? 'untitled' : slug
+  end
+end
+
+module Taxonomy
+  module_function
+
+  def collect_posts
+    posts = Dir.glob(File.join(POSTS_DIR, '**', '*.{md,markdown}'), File::FNM_CASEFOLD)
+    errors = []
+
+    groups = {
+      tag: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } },
+      category: Hash.new { |h, k| h[k] = { preferred_label: nil, labels: Set.new, documents: [] } }
+    }
+
+    result = posts.each_with_object(groups) do |path, acc|
+      begin
+        content = read_post(path)
+        data = FrontMatter.load(content)
+
+        title = data['title'].to_s.strip
+        date = parse_date(data['date']) || date_from_filename(path)
+        permalink = build_permalink(data, path, date)
+        next unless permalink
+
+        payload = {
+          'title' => title.empty? ? '(Sem título)' : title,
+          'date' => date,
+          'url' => permalink,
+          'hero_image' => preferred_image(data),
+          'cover' => data['cover']
+        }
+
+        taxonomy_terms(data, 'tags', 'tag').each do |tag|
+          slug = Slug.latin_slug(tag)
+          entry = acc[:tag][slug]
+          entry[:preferred_label] ||= tag
+          entry[:labels] << tag
+          entry[:documents] << payload.dup
+        end
+
+        taxonomy_terms(data, 'categories', 'category').each do |category|
+          slug = Slug.latin_slug(category)
+          entry = acc[:category][slug]
+          entry[:preferred_label] ||= category
+          entry[:labels] << category
+          entry[:documents] << payload.dup
+        end
+      rescue StandardError => e
+        errors << { path: path, error: e, context: :collect }
+      end
+    end
+
+    [result, errors]
+  end
+
+  def read_post(path)
+    File.open(path, 'r:bom|utf-8') do |file|
+      file.read.encode('UTF-8', invalid: :replace, undef: :replace)
+    end
+  rescue EncodingError => e
+    raise EncodingError, "#{path}: não foi possível converter o conteúdo para UTF-8 (#{e.message})"
+  end
+
+  def preferred_image(data)
+    [data['hero_image'], data['cover'], data['thumbnail'], data['image']].map do |candidate|
+      candidate.to_s.strip
+    end.find { |candidate| !candidate.empty? }
+  end
+
+  def build_permalink(data, path, date)
+    explicit = data['permalink']
+    if explicit && !explicit.to_s.strip.empty?
+      url = explicit.to_s.strip
+      return url.start_with?('/') ? url : "/#{url}"
+    end
+
+    slug = post_slug(data, path)
+    return nil if slug.nil? || slug.empty?
+
+    segments = []
+    taxonomy_terms(data, 'categories', 'category').each do |category|
+      segments << Slug.latin_slug(category)
+    end
+
+    if date
+      segments << format('%04d', date.year)
+      segments << format('%02d', date.month)
+      segments << format('%02d', date.day)
+    end
+
+    segments << slug
+
+    "/#{segments.compact.join('/').gsub(%r{//+}, '/')}/"
+  end
+
+  def post_slug(data, path)
+    explicit_slug = data['slug'].to_s.strip
+    return Slug.latin_slug(explicit_slug) unless explicit_slug.empty?
+
+    title = data['title'].to_s.strip
+    slug_from_title = Slug.latin_slug(title)
+    return slug_from_title unless slug_from_title.nil? || slug_from_title == 'untitled'
+
+    slug_from_filename(path)
+  end
+
+  def slug_from_filename(path)
+    filename = File.basename(path, File.extname(path))
+    if filename =~ /\A\d{4}-\d{2}-\d{2}-(.+)\z/
+      Slug.latin_slug(Regexp.last_match(1))
+    else
+      Slug.latin_slug(filename)
+    end
+  end
+
+  def parse_date(value)
+    case value
+    when Time then value
+    when Date then value.to_time
+    when String then Time.parse(value)
+    else
+      nil
+    end
+  rescue ArgumentError
+    nil
+  end
+
+  def date_from_filename(path)
+    filename = File.basename(path)
+    if filename =~ /\A(\d{4})-(\d{2})-(\d{2})-/
+      Time.new(Regexp.last_match(1).to_i, Regexp.last_match(2).to_i, Regexp.last_match(3).to_i)
+    end
+  end
+
+  def ensure_directories
+    TAXONOMY_DIRS.each_value do |dir|
+      FileUtils.mkdir_p(dir)
+    end
+  end
+
+  def generate
+    ensure_directories
+
+    taxonomies, read_errors = collect_posts
+    generation_errors = []
+
+    taxonomies.each do |type, entries|
+      write_taxonomy(type, entries, generation_errors)
+    end
+
+    report_errors(read_errors + generation_errors)
+  end
+
+  def write_taxonomy(type, entries, errors)
+    base_dir = TAXONOMY_DIRS.fetch(type)
+    keep_slugs = Set.new
+
+    entries.sort_by { |slug, entry| [Slug.latin_slug(entry[:preferred_label] || slug), slug] }.each do |slug, entry|
+      documents = entry[:documents]
+      next if documents.empty?
+
+      begin
+        preferred_label = entry[:preferred_label] || slug
+        page_path = File.join(base_dir, "#{slug}.md")
+        keep_slugs << slug
+
+        front_matter = build_front_matter(type, slug, preferred_label, documents)
+        content = front_matter_to_yaml(front_matter)
+
+        if !File.exist?(page_path) || read_generated_page(page_path) != content
+          File.write(page_path, content, mode: 'w:UTF-8')
+          puts "[#{type}] wrote #{page_path.sub(ROOT + '/', '')}"
+        end
+      rescue StandardError => e
+        errors << { path: page_path || File.join(base_dir, slug || 'erro'), error: e, context: "#{type}:#{preferred_label}" }
+      end
+    end
+
+    remove_stale_entries(base_dir, keep_slugs, errors)
+  end
+
+  def build_front_matter(type, slug, preferred_label, documents)
+    count = documents.length
+    count_text = count == 1 ? 'publicação' : 'publicações'
+
+    description = if type == :tag
+                    verb = count == 1 ? 'marcada' : 'marcadas'
+                    "#{count} #{count_text} #{verb} com ##{preferred_label}."
+                  else
+                    "#{count} #{count_text} na categoria #{preferred_label}."
+                  end
+
+    {
+      'layout' => LAYOUT_NAME,
+      'title' => type == :tag ? "##{preferred_label}" : preferred_label,
+      'taxonomy_type' => type.to_s,
+      'taxonomy_term' => preferred_label,
+      'taxonomy_slug' => slug,
+      'permalink' => "/#{type}/#{slug}/",
+      'description' => description,
+      'extra_css' => EXTRA_CSS,
+      'posts' => documents
+    }
+  end
+
+  def front_matter_to_yaml(data)
+    require 'yaml'
+    yaml = YAML.dump(data, indentation: 2, line_width: -1)
+    yaml = yaml.sub(/\A---\s*\n/, "---\n")
+    yaml << "---\n"
+    yaml
+  end
+
+  def read_generated_page(path)
+    File.open(path, 'r:bom|utf-8') { |file| file.read }
+  end
+
+  def remove_stale_entries(base_dir, keep_slugs, errors)
+    # Remove arquivos .md que não estão mais em uso
+    existing_md_files = Dir.glob(File.join(base_dir, '*.md'))
+    keep_files = keep_slugs.map { |slug| File.join(base_dir, "#{slug}.md") }
+    stale_md_files = existing_md_files - keep_files
+
+    stale_md_files.each do |file|
+      begin
+        File.unlink(file)
+        puts "removed stale file #{file.sub(ROOT + '/', '')}"
+      rescue StandardError => e
+        errors << { path: file, error: e, context: :cleanup }
+      end
+    end
+
+    # Remove pastas antigas (legacy de index.md)
+    Dir.glob(File.join(base_dir, '*')).each do |entry|
+      next if File.basename(entry) == 'index.html'
+      if File.directory?(entry)
+        begin
+          FileUtils.rm_rf(entry)
+          puts "removed stale directory #{entry.sub(ROOT + '/', '')}"
+        rescue StandardError => e
+          errors << { path: entry, error: e, context: :cleanup_dir }
+        end
+      end
+    end
+  end
+
+  def taxonomy_terms(data, *keys)
+    keys.flat_map do |key|
+      normalise_terms(data[key])
+    end
+        .map { |term| term.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+  end
+
+  def normalise_terms(value)
+    case value
+    when nil
+      []
+    when Array
+      value.flat_map { |item| normalise_terms(item) }
+    when String
+      value.split(',').map(&:strip)
+    else
+      Array(value)
+    end
+  end
+
+  def report_errors(errors)
+    return if errors.empty?
+
+    $stderr.puts 'Falha ao processar alguns posts:'
+    errors.each do |error|
+      location = error[:context] ? "#{error[:context]} (#{error[:path]})" : error[:path]
+      message = "  - #{location}: #{error[:error].class}: #{error[:error].message}"
+      $stderr.puts(message)
+      first_frame = Array(error[:error].backtrace).first
+      $stderr.puts("      ↳ #{first_frame}") if first_frame
+    end
+
+    raise 'não foi possível gerar todas as páginas de taxonomia'
+  end
+end
+
+Taxonomy.generate if $PROGRAM_NAME == __FILE__
