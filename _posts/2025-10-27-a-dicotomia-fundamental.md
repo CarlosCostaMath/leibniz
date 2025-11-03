@@ -2,7 +2,7 @@
 layout: post
 title: "A Dicotomia Fundamental na Filosofia da Linguagem de Leibniz"
 subtitle: ""
-date: 2025-11-27 16:00:00 -0300   # alinhei a data ao nome do arquivo
+date: 2025-10-27 16:00:00 -0300   # alinhei a data ao nome do arquivo
 featured: true
 hero_image: https://musterfabrik-berlin.de/landingpage/wp-content/uploads/2021/04/MFB-GWLB-LH35-Gif1.gif
 hero_caption: "'Fragmentos de Leibniz' (grupo de prateleira LH35) © MusterFabrik Berlim. — <a href=\"https://musterfabrik-berlin.de/landingpage/index.php/leibniz-handschriften\" target=\"_blank\" rel=\"noopener\">Imagem: MusterFabrik Berlin</a>"
