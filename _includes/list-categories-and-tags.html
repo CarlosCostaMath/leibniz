@@ -1,0 +1,50 @@
+{%- comment -%}
+  Include para listar categorias ou tags, baseado nas páginas geradas pelo script.
+  Parâmetros esperados:
+    include.type: "categories" ou "tags" (obrigatório)
+    include.title: O título opcional para o cabeçalho (padrão: page.title)
+    include.description: A descrição opcional para o cabeçalho (padrão: page.description)
+{%- endcomment -%}
+
+{%- assign tax_type = include.type -%}
+{%- assign tax_title = include.title | default: page.title -%}
+{%- assign tax_description = include.description | default: page.description -%}
+{%- comment -%} Mapeia o tipo para o valor usado no front_matter pelo script {%- endcomment -%}
+{%- assign taxonomy_type_value = tax_type | replace: "ies", "y" | replace: "es", "" -%} <!-- categories -> category, tags -> tag -->
+
+<section class="page-section taxonomy-page" id="{{ tax_type }}-page">
+  <!-- Cabeçalho -->
+  <div class="inner">
+    <header class="major taxonomy-header">
+      <h1>{{ tax_title }}</h1>
+      {%- if tax_description -%}
+        <p class="dek">{{ tax_description }}</p>
+      {%- endif -%}
+    </header>
+  </div>
+
+  {%- comment -%}
+    Busca páginas geradas pelo script com o tipo de taxonomia correto.
+  {%- endcomment -%}
+  {%- assign tax_pages = site.pages | where: "taxonomy_type", taxonomy_type_value -%}
+  {%- assign sorted = tax_pages | sort: "taxonomy_slug" -%}
+
+  {%- if sorted and sorted.size > 0 -%}
+    <ul class="taxonomy-nav">
+      {%- for p in sorted -%}
+        <li>
+          <a class="button small outline" href="{{ p.url | relative_url }}">
+            {%- if tax_type == "tags" -%}# {%- endif -%}
+            {{ p.title }}
+            {%- comment -%} Apenas exibe contagem se a página tiver a lista de posts {%- endcomment -%}
+            {%- if p.posts and p.posts.size > 0 -%}
+              <span class="taxonomy-count">({{ p.posts | size }})</span>
+            {%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- else -%}
+    <p>Ainda não há {{ tax_type | capitalize }} cadastradas.</p>
+  {%- endif -%}
+</section>
