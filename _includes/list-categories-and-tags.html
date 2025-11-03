@@ -10,13 +10,20 @@
 {%- assign tax_title = include.title | default: page.title -%}
 {%- assign tax_description = include.description | default: page.description -%}
 {%- comment -%} Mapeia o tipo para o valor usado no front_matter pelo script {%- endcomment -%}
-{%- assign taxonomy_type_value = tax_type | replace: "ies", "y" | replace: "es", "" -%} <!-- categories -> category, tags -> tag -->
+{%- if tax_type == "categories" -%}
+  {%- assign taxonomy_type_value = "category" -%}
+{%- elsif tax_type == "tags" -%}
+  {%- assign taxonomy_type_value = "tag" -%}
+{%- else -%}
+  {%- comment -%} Caso inesperado {%- endcomment -%}
+  {%- assign taxonomy_type_value = "" -%}
+{%- endif -%}
 
-<!-- DEBUG: Mostra os valores usados -->
+<!-- DEBUG (remover depois): -->
 <p>[DEBUG] tax_type: {{ tax_type }}</p>
 <p>[DEBUG] taxonomy_type_value: {{ taxonomy_type_value }}</p>
 
-<!-- DEBUG: Conta páginas encontradas -->
+<!-- DEBUG (remover depois): -->
 {% assign debug_pages = site.pages | where: "taxonomy_type", taxonomy_type_value %}
 <p>[DEBUG] Total de páginas com taxonomy_type '{{ taxonomy_type_value }}': {{ debug_pages | size }}</p>
 
@@ -37,7 +44,7 @@
   {%- assign tax_pages = site.pages | where: "taxonomy_type", taxonomy_type_value -%}
   {%- assign sorted = tax_pages | sort: "taxonomy_slug" -%}
 
-  <!-- DEBUG: Mostra o tamanho da lista final -->
+  <!-- DEBUG (remover depois): -->
   <p>[DEBUG] Tamanho da lista 'sorted': {{ sorted.size }}</p>
 
   {%- if sorted and sorted.size > 0 -%}
