@@ -8,7 +8,6 @@ hero_image: https://musterfabrik-berlin.de/landingpage/wp-content/uploads/2021/0
 hero_caption: "'Fragmentos de Leibniz' (grupo de prateleira LH35) © MusterFabrik Berlim. — <a href=\"https://musterfabrik-berlin.de/landingpage/index.php/leibniz-handschriften\" target=\"_blank\" rel=\"noopener\">Imagem: MusterFabrik Berlin</a>"
 description: "Leibniz separa línguas naturais — históricas, imprecisas e humanas — de línguas artificiais — lógicas, exatas e universais. Essa dicotomia não é técnica, mas filosófica: é a linha que divide o acaso da experiência da necessidade da razão."
 author: Carlos Costa
-reading_time: "10 min de leitura"
 categories:
 - Filosofia
 tags:
