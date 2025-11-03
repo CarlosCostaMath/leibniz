@@ -8,7 +8,6 @@ hero_image: images/calculemus/calculemus-capa.jpeg
 hero_caption: "Leibniz. — <a href=\"https://web.ics.purdue.edu/~jacover/Leibniz.htm\" target=\"_blank\" rel=\"noopener\">Imagem: purdue.edu</a>"
 description: "Descubra como um filósofo do século XVII antecipou através de uma visão revolucionária sobre o próprio ato de pensar."
 author: Carlos Costa
-reading_time: "12 min de leitura"
 categories:
 - Filosofia
 tags:
