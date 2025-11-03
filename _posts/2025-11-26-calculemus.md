@@ -9,12 +9,11 @@ hero_caption: "Leibniz. — <a href=\"https://web.ics.purdue.edu/~jacover/Leibni
 description: "Descubra como um filósofo do século XVII antecipou através de uma visão revolucionária sobre o próprio ato de pensar."
 author: Carlos Costa
 categories:
-- Filosofia
+- Filosofia do Conhecimento
 tags:
 - Lógica
 - História
 - Computação
-- Reparação
 ---
 
 ## O Filósofo dos Múltiplos Mundos e de Uma Só Lógica
