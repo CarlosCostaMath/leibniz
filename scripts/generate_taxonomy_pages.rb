@@ -6,8 +6,8 @@ require 'fileutils'
 require 'set'
 require 'time'
 require 'date'
-require 'bundler/setup'
-require 'jekyll'  # ← ADICIONADO: necessário para Jekyll::Utils.slugify
+require 'bundler/setup' unless ENV['SKIP_BUNDLER_SETUP'] == '1'
+require 'jekyll' unless ENV['SKIP_JEKYLL_REQUIRE'] == '1'  # ← ADICIONADO: necessário para Jekyll::Utils.slugify
 
 ROOT = File.expand_path('..', __dir__)
 POSTS_DIR = File.join(ROOT, '_posts')
@@ -25,7 +25,7 @@ class FrontMatter
     match = content.match(FRONT_MATTER_REGEX)
     return {} unless match
 
-    YAML.safe_load(match[1], permitted_classes: [Date, Time]) || {}
+    YAML.safe_load(match[1], permitted_classes: [Date, Time], aliases: true) || {}
   end
 end
 
@@ -322,4 +322,4 @@ module Taxonomy
   end
 end
 
-Taxonomy.generate
+Taxonomy.generate if $PROGRAM_NAME == __FILE__
