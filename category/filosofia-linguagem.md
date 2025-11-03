@@ -1,11 +1,11 @@
 ---
 layout: taxonomy
-title: "#Computação"
-taxonomy_type: tag
-taxonomy_term: Computação
-taxonomy_slug: computacao
-permalink: "/tag/computacao/"
-description: '1 publicação marcada com #Computação.'
+title: Filosofia Linguagem
+taxonomy_type: category
+taxonomy_term: Filosofia Linguagem
+taxonomy_slug: filosofia-linguagem
+permalink: "/category/filosofia-linguagem/"
+description: 1 publicação na categoria Filosofia Linguagem.
 extra_css:
 - "/assets/css/taxonomy.css"
 posts:
