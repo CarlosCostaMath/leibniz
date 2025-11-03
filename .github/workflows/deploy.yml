@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # ← ALTERADO para 'write' (necessário para commit)
+  contents: write
   pages: write
   id-token: write
 
@@ -21,7 +21,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # ← necessário para push
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -50,6 +51,8 @@ jobs:
         with:
           commit_message: "chore(taxonomy): sync generated pages"
           add_options: "-A"
+          commit_options: "--no-verify"
+          push_options: "--force"
           file_pattern: |
             tag/
             category/
