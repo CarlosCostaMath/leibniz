@@ -118,9 +118,7 @@ module Taxonomy
     return nil if slug.nil? || slug.empty?
 
     segments = []
-    taxonomy_terms(data, 'categories', 'category').each do |category|
-      segments << Slug.latin_slug(category)
-    end
+    segments.concat(category_path_segments(data))
 
     if date
       segments << format('%04d', date.year)
@@ -131,6 +129,15 @@ module Taxonomy
     segments << slug
 
     "/#{segments.compact.join('/').gsub(%r{//+}, '/')}/"
+  end
+
+  def category_path_segments(data)
+    raw_path = data['category_path']
+    if raw_path.is_a?(String) && !raw_path.strip.empty?
+      raw_path.strip.split('/').reject(&:empty?)
+    else
+      taxonomy_terms(data, 'categories', 'category').map { |category| Slug.latin_slug(category) }
+    end
   end
 
   def post_slug(data, path)
