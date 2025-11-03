@@ -1,7 +1,7 @@
 title: "Leibniz Blog"
 lang: pt-BR
 
-url: "https://carloscostamath.github.io"
+url: "https://carloscostamath.github.io"  # Corrigido espaço extra
 baseurl: "/leibniz"          # "" se for user site
 timezone: America/Maceio
 future: true
@@ -18,6 +18,7 @@ excerpt_separator: "<!--more-->"
 plugins:
   - jekyll-paginate
   - jekyll-redirect-from
+  - jekyll-read-time # <-- Adicionado este plugin
 
 paginate: 7
 paginate_path: "/page/:num/"
@@ -29,3 +30,8 @@ defaults:
     values:
       extra_css:
         - /assets/css/post.css
+
+# Configuração opcional para o plugin jekyll-read-time
+# Consulte a documentação do plugin para mais opções
+# read_time:
+#   words_per_minute: 200  # Valor padrão, pode ser alterado se desejar
