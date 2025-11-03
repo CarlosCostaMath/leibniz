@@ -8,7 +8,7 @@ future: true
 
 markdown: kramdown
 theme: null
-permalink: /:categories/:year/:month/:day/:title/
+permalink: /:year/:month/:day/:title/
 
 collections:
   posts:
