@@ -30,7 +30,7 @@ jobs:
         run: bundle install --jobs 4 --retry 3
 
       - name: Generate taxonomy pages
-        run: ruby scripts/generate_taxonomy_pages.rb
+        run: bundle exec ruby scripts/generate_taxonomy_pages.rb
 
       - name: Build site with Jekyll
         run: bundle exec jekyll build --trace
